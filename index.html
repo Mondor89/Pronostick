@@ -2782,7 +2782,7 @@ async function fetchWebData(team1, team2, competition, sport, matchDate) {
       for (const block of assistantContent) { if (block.type==='text'&&block.text) finalText+=block.text+'\n'; }
       const toolUseBlocks = assistantContent.filter(b=>b.type==='tool_use');
       if (!toolUseBlocks.length) break;
-      const toolResults = toolUseBlocks.map(tu=>({type:"tool_result",tool_use_id:tu.id,content:'Ricerca eseguita per: "' + tu.input?.query||'' + '". Procedi con il riassunto.'}));
+      const toolResults = toolUseBlocks.map(tu=>({type:"tool_result",tool_use_id:tu.id,content:'Ricerca eseguita per: "' + (tu.input?.query || '') + '". Procedi con il riassunto.'}));
       messages.push({role:"user",content:toolResults});
     }
     return {text:finalText.trim()};
@@ -2822,10 +2822,10 @@ function buildMemory(sport, competition) {
     const date = new Date(e.matchDate).toLocaleDateString('it-IT', { day: '2-digit', month: 'short', year: 'numeric' });
     const esito = v.esito_scommessa || '?';
     const accuracy = v.accuratezza || '?';
-    text += '[' + i + 1 + '] ' + e.team1 + ' vs ' + e.team2 + ' (' + e.sport + e.competition ? ' · ' + e.competition : '' + ') — ' + date + '\n';
+    text += '[' + (i + 1) + '] ' + e.team1 + ' vs ' + e.team2 + ' (' + e.sport + (e.competition ? ' · ' + e.competition : '') + ') — ' + date + '\n';
     text += '    Pronostico: ' + e.pronostico + ' → Esito: ' + esito + ' (' + accuracy + ')\n';
-    text += '    ✅ Indovinato: ' + v.cosa_ha_indovinato || '—' + '\n';
-    text += '    ❌ Sbagliato: ' + v.cosa_ha_sbagliato || '—' + '\n';
+    text += '    ✅ Indovinato: ' + (v.cosa_ha_indovinato || '—') + '\n';
+    text += '    ❌ Sbagliato: ' + (v.cosa_ha_sbagliato || '—') + '\n';
     text += '    🧠 Lezione: ' + v.nota_apprendimento + '\n\n';
   });
 
@@ -4260,8 +4260,8 @@ function buildFullDetailHTML(e) {
 
   return '<div class="full-detail" id="detail_' + e.id + '">'
     + '<div class="full-detail-banner">'
-    + '<div class="full-detail-match">' + e.team1 + ' vs ' + e.team2 + ' ' + liveBadge + '</div>'
-    + '<div class="full-detail-meta">' + e.sport + (e.competition?' · '+e.competition:'') + ' · 📅 ' + e.matchDate + ' · 💾 ' + dateStr + ' ' + timeStr + '</div>'
+    + '<div class="full-detail-match">' + escapeHtml(e.team1) + ' vs ' + escapeHtml(e.team2) + ' ' + liveBadge + '</div>'
+    + '<div class="full-detail-meta">' + escapeHtml(e.sport) + (e.competition?' · '+escapeHtml(e.competition):'') + ' · 📅 ' + escapeHtml(e.matchDate) + ' · 💾 ' + dateStr + ' ' + timeStr + '</div>'
     + '<div class="fd-conf-row"><div><div class="fd-conf-pill">🎯 Confidenza: ' + e.confidenza + '%</div></div>'
     + '<div class="fd-quota"><div class="fd-quota-num">' + e.quota + '</div><div class="fd-quota-label">Quota Stimata</div></div></div>'
     + '</div>'
@@ -4364,8 +4364,8 @@ function renderResult(r, team1, team2, competition, webText, showSave, mercati, 
   document.getElementById('resultCard').innerHTML =
     '<div class="verdict-banner">'
     + '<div class="verdict-header">'
-    + '<div><div class="verdict-match" style="display:flex;align-items:center;flex-wrap:wrap;gap:6px">' + team1 + ' vs ' + team2 + liveBadge + memoryBadge + '</div>'
-    + (competition ? '<div style="color:var(--muted);font-size:0.8rem;margin-top:4px;letter-spacing:1px">' + competition.toUpperCase() + '</div>' : '')
+    + '<div><div class="verdict-match" style="display:flex;align-items:center;flex-wrap:wrap;gap:6px">' + escapeHtml(team1) + ' vs ' + escapeHtml(team2) + liveBadge + memoryBadge + '</div>'
+    + (competition ? '<div style="color:var(--muted);font-size:0.8rem;margin-top:4px;letter-spacing:1px">' + escapeHtml(competition.toUpperCase()) + '</div>' : '')
     + '</div>'
     + '<div class="confidence-pill"><span class="confidence-label">Confidenza</span><span class="confidence-value">' + r.confidenza + '%</span></div>'
     + '</div>'
@@ -4432,7 +4432,7 @@ async function verificaRisultato(id) {
       for (const block of assistantContent) { if (block.type === 'text' && block.text) risultatoWeb += block.text + '\n'; }
       const toolUse = assistantContent.filter(b => b.type === 'tool_use');
       if (!toolUse.length) break;
-      messages.push({ role: "user", content: toolUse.map(tu => ({ type: "tool_result", tool_use_id: tu.id, content: 'Cerca il risultato di ${entry.team1} vs ${entry.team2} del ${entry.matchDate}' })) });
+      messages.push({ role: "user", content: toolUse.map(tu => ({ type: "tool_result", tool_use_id: tu.id, content: `Cerca il risultato di ${entry.team1} vs ${entry.team2} del ${entry.matchDate}` })) });
     }
   } catch(e) { risultatoWeb = ''; }
 
