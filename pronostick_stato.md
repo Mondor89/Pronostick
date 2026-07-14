@@ -9,7 +9,7 @@
 | Campo | Valore |
 |-------|--------|
 | **Ultimo aggiornamento** | 14/07/2026 |
-| **Ultima sessione** | Applicato template CLAUDE.md (Claude Code) |
+| **Ultima sessione** | Fix critico regole Firestore scadute (invariante #5) + fix logout/localStorage + tooling locale (Python/Node) |
 | **Deploy** | https://pronostick.netlify.app/ |
 | **GitHub** | Mondor89/Pronostick |
 | **Tier Anthropic** | Tier 1 (modello consigliato: Haiku) |
@@ -17,7 +17,7 @@
 ---
 
 ## Focus Attuale
-App funzionante e deployata, appena passata da un code review approfondito con bug reali corretti (vedi Task Completate). Prossimo passo: sistema Tag Pattern per AI Memory.
+App funzionante e deployata. Chiusa una falla di sicurezza reale (regole Firestore scadute/default, invariante #5 — vedi `pronostick_sicurezza.md`) e un bug di privacy sui dispositivi condivisi (logout non svuotava localStorage). Prossimi passi: correggere i 2 bug aperti in Bug Noti (self-XSS in `updateAuthUI()`, partite passate non eliminabili dal calendario), poi sistema Tag Pattern per AI Memory.
 
 ---
 
@@ -34,11 +34,11 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 ## Task Aperte
 
 ### Priorità Alta
-- [ ] Verificare funzionalmente il sync dopo la pubblicazione delle nuove regole Firestore (14/07/2026) — login Google + salvataggio/lettura storico e calendario, controllare assenza errori in console
+- [ ] Correggere self-XSS in `updateAuthUI()` (vedi Bug Noti #1)
+- [ ] Aggiungere pulsante elimina singola per le partite passate nel calendario (vedi Bug Noti #2)
 - [ ] Sistema Tag Pattern per AI Memory (con 30+ pronostici verificati)
 - [ ] Upgrade modello a Sonnet quando Tier 2 (≥$40 spesi)
 - [ ] Filtro date nello storico
-- [ ] Correggere self-XSS in `updateAuthUI()` (vedi Bug Noti #1)
 
 ### Priorità Media
 - [ ] Aggiornare sezione Guida con le nuove feature
@@ -72,6 +72,7 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 - [x] Corretto `logoutGoogle()` (index.html:1996) — non svuotava `localStorage` (storico/calendario) al logout, dati restavano visibili come se l'utente fosse ancora loggato (14/07/2026)
 - [x] Installati Python 3.12 e Node.js LTS in locale + `.claude/launch.json` (server statico Python su porta 8080) per testare l'app in anteprima prima del push, invece di aspettare sempre il deploy Netlify (14/07/2026)
 - [x] Verificato il fix di `logoutGoogle()` in anteprima locale: dati finti in `localStorage` correttamente svuotati dopo il logout, nessun errore console (14/07/2026)
+- [x] Verificato funzionalmente il sync Firestore dopo le nuove regole (14/07/2026) — Fabio ha salvato un pronostico nello storico, rimasto persistito
 
 ---
 
@@ -133,3 +134,4 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 - Proxy Netlify timeout: 26s max (non aumentabile senza piano Pro)
 - Non usare innerHTML per card DOM (preservare event listener)
 - Attenzione virgolette singole in stringhe JS con HTML
+- Python 3.12 e Node.js LTS installati in locale (14/07/2026) — server di anteprima disponibile con `.claude/launch.json` (`localhost:8080`), utile per testare modifiche prima del push

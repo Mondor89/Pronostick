@@ -16,8 +16,9 @@
 
 | # | Invariante | Stato | Note |
 |---|-----------|-------|------|
-| 1-4 | Vedi sopra | ✅ Verificate (code review 14/07/2026) | Bug di escaping mancante (#4) corretti lo stesso giorno |
-| 5 | Isolamento dati Firestore per utente | ✅ **Corrette e pubblicate (14/07/2026)** | Erano le regole di default "modalità test" di Firebase, scadute il 17/05/2026, senza `request.auth` (violazione storica, vedi Registro Decisioni). Fabio ha pubblicato le regole di `firestore.rules` in Firebase Console lo stesso giorno. Verifica funzionale (login + salvataggio storico/calendario) ancora da fare — vedi `pronostick_stato.md`. |
+| 1-3 | Vedi sopra | ✅ Verificate (code review 14/07/2026) | — |
+| 4 | Escaping input utente prima di `innerHTML` | ⚠️ **Eccezione nota aperta** | Bug originali (team1/team2/competition/sport/matchDate) corretti il 14/07/2026. Trovata nuova violazione in `updateAuthUI()` (index.html:2097-2098, `user.photoURL`/`displayName` non passati da `escapeHtml()`) — vedi Bug Noti #1 in `pronostick_stato.md`, non ancora corretta |
+| 5 | Isolamento dati Firestore per utente | ✅ **Corrette, pubblicate e verificate funzionalmente (14/07/2026)** | Erano le regole di default "modalità test" di Firebase, scadute il 17/05/2026, senza `request.auth` (violazione storica, vedi Registro Decisioni). Fabio ha pubblicato le regole di `firestore.rules` in Firebase Console e testato il salvataggio storico, funzionante. |
 | 6 | — | ✅ Nota informativa, nessuna azione richiesta | — |
 
 ## Superficie di Attacco per Funzionalità
@@ -26,7 +27,7 @@
 |---|---|---|---|---|
 | Analisi pronostico (`analyzeMatch`) | Sì (API key via header) | No | Sì (risposta AI, eventuale web search) | Team/competition/context inseriti dall'utente, ora sanificati |
 | Cerca Quote Bookmaker | Sì (API key) | No | Sì (risultato ricerca web) | — |
-| Login Google / sync Firebase | No | Sì (storico, calendario) | No | Isolamento dipende dalle Firestore Rules (vedi #5 sopra) |
+| Login Google / sync Firebase | No | Sì (storico, calendario) | Parzialmente (`user.displayName` è impostabile dall'utente sul proprio account Google) | Isolamento lato regole vedi #5. `updateAuthUI()` non sanifica `displayName`/`photoURL` — vedi invariante #4, Bug Noti #1 |
 | Import/Export backup JSON | No | Sì (dati locali) | Sì (file caricato dall'utente) | `processImport()` — verificare che il parsing non esegua codice, solo `JSON.parse` |
 
 ## Checklist VERIFICA-SICUREZZA

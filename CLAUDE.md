@@ -208,12 +208,17 @@ Se emerge un bug altrove, annotarlo in "Bug Noti" di `pronostick_stato.md` e tor
 
 ```
 Pronostick/
-├── CLAUDE.md                     ← questo file
-├── index.html                    ← app single-file (HTML+CSS+JS inline, ~4800+ righe)
-├── pronostick_stato.md            ← stato, task, decisioni, alternative, bug noti, log
-├── pronostick_sicurezza.md        ← invarianti di sicurezza
-├── netlify.toml                   ← config deploy Netlify
-└── netlify/functions/proxy.js     ← proxy serverless verso Anthropic API (BYOK)
+├── CLAUDE.md                        ← questo file
+├── index.html                       ← app single-file (HTML+CSS+JS inline, ~4800+ righe)
+├── pronostick_stato.md               ← stato, task, decisioni, alternative, bug noti, log
+├── pronostick_sicurezza.md           ← invarianti di sicurezza
+├── firestore.rules                   ← regole di sicurezza Firestore (versione di riferimento, va pubblicata a mano in Firebase Console)
+├── netlify.toml                      ← config deploy Netlify
+├── netlify/functions/proxy.js        ← proxy serverless verso Anthropic API (BYOK)
+├── scripts/check-known-bug-patterns.sh  ← controllo euristico pre-commit dei pattern-trappola noti
+├── .claude/launch.json               ← config server locale di anteprima (Python http.server, porta 8080)
+├── .gitignore
+└── .gitattributes                    ← forza LF sugli .sh (evita rotture da autocrlf Windows)
 ```
 
 Se `index.html` dovesse superare le ~6000 righe o servissero più pagine distinte, valutare lo split in una struttura multi-file (vedi `CLAUDE_APP_TEMPLATE.md`).
@@ -273,3 +278,5 @@ Messaggio commit: `Sessione N — [funzionalità] / [cosa fatto] / [cosa resta]`
 - Preferenza per stack semplice: niente build step/framework pesante
 - L'app usa l'API Anthropic a consumo (BYOK) — monitorare che il pannello costi resti accurato quando si aggiungono chiamate
 - Firebase è usato per Auth + Firestore, non per hosting (quello è su Netlify)
+- Python e Node.js sono installati in locale (14/07/2026) — disponibile un server di anteprima locale (`.claude/launch.json`, `localhost:8080`) per testare modifiche prima del push, invece di aspettare sempre il deploy Netlify
+- Claude Code non può ricevere né gestire credenziali (password, API key, service account, login CLI) di Firebase o altri servizi esterni — per configurazioni che richiedono accesso autenticato (es. regole Firestore), il flusso è: Fabio copia/incolla il dato non sensibile dalla console, o esegue lui stesso l'azione con permessi
