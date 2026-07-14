@@ -70,6 +70,8 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 - [x] Creato `scripts/check-known-bug-patterns.sh` — controllo euristico dei pattern-trappola (precedenza operatori, apici vs backtick, escaping mancante), richiamato nella checklist pre-commit di `CLAUDE.md` (14/07/2026)
 - [x] Regole Firestore corrette scritte in `firestore.rules` e pubblicate da Fabio in console (14/07/2026) — chiude invariante #5
 - [x] Corretto `logoutGoogle()` (index.html:1996) — non svuotava `localStorage` (storico/calendario) al logout, dati restavano visibili come se l'utente fosse ancora loggato (14/07/2026)
+- [x] Installati Python 3.12 e Node.js LTS in locale + `.claude/launch.json` (server statico Python su porta 8080) per testare l'app in anteprima prima del push, invece di aspettare sempre il deploy Netlify (14/07/2026)
+- [x] Verificato il fix di `logoutGoogle()` in anteprima locale: dati finti in `localStorage` correttamente svuotati dopo il logout, nessun errore console (14/07/2026)
 
 ---
 
@@ -94,6 +96,7 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 | 14/07/2026 | Adottato `CLAUDE.md` (Claude Code) basato su `CLAUDE_APP_TEMPLATE.md` + nuovo file `pronostick_sicurezza.md` | Standardizzare il workflow con gli altri progetti (giochi) e formalizzare le invarianti di sicurezza emerse dal code review |
 | 14/07/2026 | Aggiunti comandi PATCH e auto-audit a `CLAUDE.md`, ispirati alle regole `claude_doc_rules.md` di un altro progetto Claude | Colmare un gap: prima non esisteva un modo esplicito per far emergere/correggere regole del CLAUDE.md stesso durante o a fine sessione |
 | 14/07/2026 | Per verificare le regole Firestore (invariante #5), niente Firebase CLI/service account: Fabio copia le regole dalla console e le incolla/salva come `firestore.rules` nel repo | Claude Code non può ricevere password/API key/token per regola fissa di sicurezza; il copia-incolla ottiene lo stesso risultato (verifica + versionamento) senza gestire credenziali |
+| 14/07/2026 | Installati sia Python che Node.js in locale (non solo Python) | Fabio ha chiesto esplicitamente entrambi; Node abilita anche npm/Firebase CLI in futuro, Python resta comunque l'opzione minima per il solo server di anteprima statico |
 
 ---
 
