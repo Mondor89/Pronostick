@@ -156,6 +156,7 @@ Se **a sessione già avviata** Fabio chiede di rileggere questo file (non il pri
 - **Prima di scrivere codice nuovo, verificare cosa il sistema esistente già permette.** Una richiesta "vorrei che X potesse fare anche Y" spesso non richiede una feature nuova.
 - **Un fallback silenzioso che crea dati "vuoti" è più pericoloso di un errore esplicito.** Meglio fallire in modo visibile che generare un placeholder che sembra valido ma non lo è.
 - **Un bug che sembra "strano" o "impossibile" nasce spesso da precedenza degli operatori, non da logica sbagliata.** Vedi "Regole JavaScript/Web" più sotto — Pronostick aveva 4 bug reali di questo tipo (corretti il 14/07/2026).
+- **Quando si ripristina un handler o percorso di codice prima irraggiungibile (bottone rotto, funzione inesistente, condizione sempre falsa), testare l'azione fino in fondo con un click reale — non fermarsi a verificare che la funzione richiamata esista.** Codice a valle mai eseguito in produzione può nascondere bug dormienti scoperti solo ora (es. 14/07/2026: riabilitato il bottone Elimina nello Storico, la funzione esisteva ma un `insertBefore` al suo interno falliva su un nodo non figlio diretto — mai emerso prima perché il bottone non era mai stato cliccabile).
 
 ---
 
@@ -270,8 +271,9 @@ Messaggio commit: `Sessione N — [funzionalità] / [cosa fatto] / [cosa resta]`
 - `${variabile}` funziona SOLO dentro backtick. Dentro apici singoli/doppi è testo letterale, non viene mai sostituito.
 
 ### Escaping HTML — mai fidarsi dell'input, nemmeno il proprio [PERMANENTE]
-- Qualsiasi valore da un campo utente che finisce in `innerHTML` va passato da `escapeHtml()` — applicato in modo coerente in TUTTI i punti dove quel dato viene renderizzato (in `index.html`: `renderResult()`, `buildFullDetailHTML()`, `buildCompactCardDOM()`, `renderCalendario()`).
-- **L'elenco è indicativo, non esaustivo** — ogni nuova funzione che inserisce dati esterni/utente in `innerHTML` va aggiunta qui e verificata con `escapeHtml()`. Trovata il 14/07/2026 una violazione in `renderCalendario()` non coperta da questo elenco: non fidarsi solo della lista, controllare ogni funzione che scrive `innerHTML`.
+- Qualsiasi valore da un campo utente **o generato dall'AI** che finisce in `innerHTML` va passato da `escapeHtml()` — applicato in modo coerente in TUTTI i punti dove quel dato viene renderizzato (in `index.html`: `renderResult()`, `buildFullDetailHTML()`, `buildCompactCardDOM()`, `renderCalendario()`, `renderStats()`, `renderCombinataResult()`, `buildMercatiConsigliati()`, `renderGiocataResult()`, `renderBiasPanel()`).
+- **L'elenco è indicativo, non esaustivo** — ogni nuova funzione che inserisce dati esterni/utente/output AI in `innerHTML` va aggiunta qui e verificata con `escapeHtml()`. Trovata il 14/07/2026 una violazione in `renderCalendario()` non coperta da questo elenco: non fidarsi solo della lista, controllare ogni funzione che scrive `innerHTML`.
+- **Come verificare un fix di escaping:** iniettare lo stesso payload XSS (es. `<img src=x onerror=...>`) in TUTTI i campi sospetti di tutte le funzioni coinvolte in un solo giro di test, invece che uno alla volta — più veloce, copre l'intera superficie in un colpo (tecnica usata con successo il 14/07/2026 su 7 funzioni in parallelo).
 
 ### localStorage — chiave stabile [PERMANENTE]
 - `pronostick_apikey`, `pronostick_v3_history`, `pronostick_model` sono le chiavi correnti — non cambiarle senza gestire esplicitamente la migrazione dei dati esistenti (vedi `loadHistory()` per il pattern di migrazione già usato).

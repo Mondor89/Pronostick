@@ -1711,7 +1711,7 @@ body { padding-bottom: 70px; } /* space for tab bar */
   <div class="settings-card" id="apikeyCard" style="margin-bottom:10px;">
     <div style="font-family:'Bebas Neue',sans-serif;font-size:0.9rem;letter-spacing:2px;color:var(--text);margin-bottom:12px;">🔑 API Key Anthropic</div>
     <div class="apikey-row">
-      <input type="password" class="apikey-input" id="apikeyInput" placeholder="sk-ant-api03-..." autocomplete="new-password" onkeydown="if(event.key===\'Enter\') saveApiKey()"/>
+      <input type="password" class="apikey-input" id="apikeyInput" placeholder="sk-ant-api03-..." autocomplete="new-password" onkeydown="if(event.key==='Enter') saveApiKey()"/>
       <button class="apikey-btn" onclick="saveApiKey()">SALVA</button>
     </div>
     <div class="apikey-status missing" id="apikeyStatus" style="margin-top:8px;">⚠️ API key non configurata</div>
@@ -1928,7 +1928,7 @@ body { padding-bottom: 70px; } /* space for tab bar */
     <div style="display:flex;gap:8px;margin-top:8px;">
       <input type="text" id="giocataCustomSport" placeholder="Aggiungi sport... es. Darts, Snooker, Baseball"
         style="flex:1;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:8px 12px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.82rem;outline:none;"
-        onkeydown="if(event.key===\'Enter\'){addGiocataCustomSport();event.preventDefault();}"/>
+        onkeydown="if(event.key==='Enter'){addGiocataCustomSport();event.preventDefault();}"/>
       <button onclick="addGiocataCustomSport()" title="Aggiungi sport"
         style="background:var(--accent);color:var(--bg);border:none;border-radius:8px;width:38px;height:38px;font-size:1.3rem;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:700;">+</button>
     </div>
@@ -2815,7 +2815,29 @@ function handleFiles(files) {
 }
 function removeFile(name) { attachedFiles = attachedFiles.filter(f=>f.name!==name); renderChips(); }
 function renderChips() {
-  document.getElementById('fileChips').innerHTML = attachedFiles.map(f=>'\n    <div class="chip">\n      <span class="chip-name">✅ ' + f.name + ' <span class="chip-size">' + (f.size/1024).toFixed(1) + ' KB</span></span>\n      <button class="chip-del" onclick="removeFile(' + JSON.stringify(f.name) + ')">✕</button>\n    </div>').join('');
+  const container = document.getElementById('fileChips');
+  container.innerHTML = '';
+  attachedFiles.forEach(function(f) {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'chip-name';
+    nameSpan.textContent = '✅ ' + f.name + ' ';
+    const sizeSpan = document.createElement('span');
+    sizeSpan.className = 'chip-size';
+    sizeSpan.textContent = (f.size/1024).toFixed(1) + ' KB';
+    nameSpan.appendChild(sizeSpan);
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'chip-del';
+    delBtn.textContent = '✕';
+    delBtn.onclick = function() { removeFile(f.name); };
+
+    chip.appendChild(nameSpan);
+    chip.appendChild(delBtn);
+    container.appendChild(chip);
+  });
 }
 function buildFileContext() {
   if (!attachedFiles.length) return '';
@@ -3141,7 +3163,7 @@ function deleteEntry(id) {
   bar.appendChild(msg);
   bar.appendChild(btnWrap);
   const actions = card.querySelector('.hcard-actions');
-  if (actions) card.insertBefore(bar, actions);
+  if (actions && actions.parentNode) actions.parentNode.insertBefore(bar, actions);
   else card.appendChild(bar);
 }
 
@@ -3296,33 +3318,33 @@ function renderCombinataResult(r, partite) {
     + '<div style="text-align:center;"><div style="font-size:0.62rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Quota AI</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:2.2rem;color:var(--accent3);">' + parseFloat(r.quota_combinata).toFixed(2) + '</div></div>'
     + (quotaReale ? '<div style="text-align:center;"><div style="font-size:0.62rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Quota reale</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:2.2rem;color:var(--gold);">' + quotaReale + '</div></div>' : '')
     + '<div style="text-align:center;"><div style="font-size:0.62rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Probabilità</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:2.2rem;color:var(--text);">' + r.probabilita_combinata + '%</div></div>'
-    + '<div style="text-align:center;"><div style="font-size:0.62rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Rischio</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:2.2rem;color:' + riskColor + ';">' + r.rischio_combinata + '</div></div>'
+    + '<div style="text-align:center;"><div style="font-size:0.62rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">Rischio</div><div style="font-family:\'Bebas Neue\',sans-serif;font-size:2.2rem;color:' + riskColor + ';">' + escapeHtml(r.rischio_combinata) + '</div></div>'
     + '</div>'
     + '<div style="background:var(--surface2);border-radius:8px;padding:14px;margin-bottom:12px;">'
     + '<div style="font-size:0.62rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-bottom:6px;">📊 Analisi</div>'
-    + '<div style="font-size:0.85rem;color:#c5cad8;line-height:1.7;">' + r.analisi + '</div>'
+    + '<div style="font-size:0.85rem;color:#c5cad8;line-height:1.7;">' + escapeHtml(r.analisi) + '</div>'
     + '</div>'
     + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">'
     + '<div style="background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.2);border-radius:8px;padding:12px;">'
     + '<div style="font-size:0.62rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--danger);margin-bottom:6px;">⚠️ Punto debole</div>'
-    + '<div style="font-size:0.8rem;color:#c5cad8;line-height:1.6;">' + r.punto_debole + '</div>'
+    + '<div style="font-size:0.8rem;color:#c5cad8;line-height:1.6;">' + escapeHtml(r.punto_debole) + '</div>'
     + '</div>'
     + '<div style="background:rgba(77,166,255,0.06);border:1px solid rgba(77,166,255,0.2);border-radius:8px;padding:12px;">'
     + '<div style="font-size:0.62rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent3);margin-bottom:6px;">💡 Alternativa</div>'
-    + '<div style="font-size:0.8rem;color:#c5cad8;line-height:1.6;">' + r.alternativa + '</div>'
+    + '<div style="font-size:0.8rem;color:#c5cad8;line-height:1.6;">' + escapeHtml(r.alternativa) + '</div>'
     + '</div>'
     + '</div>'
     + '<div style="background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);border-radius:8px;padding:12px;margin-bottom:14px;">'
     + '<div style="font-size:0.62rem;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">💰 Importo consigliato</div>'
-    + '<div style="font-size:0.85rem;color:#c5cad8;">' + r.importo_consigliato + '</div>'
+    + '<div style="font-size:0.85rem;color:#c5cad8;">' + escapeHtml(r.importo_consigliato) + '</div>'
     + '</div>'
     + '<div style="font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Partite in combinata:</div>'
     + partite.map(function(p) {
         return '<div style="display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--muted);margin-bottom:4px;">'
           + '<span style="color:var(--accent3);">→</span>'
-          + '<span style="color:var(--text);">' + p.team1 + ' vs ' + p.team2 + '</span>'
-          + '<span>· ' + p.pronostico + '</span>'
-          + '<span style="color:var(--accent3);">@' + (p.quota_reale || p.quota) + '</span>'
+          + '<span style="color:var(--text);">' + escapeHtml(p.team1) + ' vs ' + escapeHtml(p.team2) + '</span>'
+          + '<span>· ' + escapeHtml(p.pronostico) + '</span>'
+          + '<span style="color:var(--accent3);">@' + escapeHtml(p.quota_reale || p.quota) + '</span>'
           + '</div>';
       }).join('')
     + '</div>';
@@ -3342,7 +3364,7 @@ function saveCalendario(data) {
 }
 function clearCalendario() {
   if (!confirm('Svuotare tutto il calendario salvato?')) return;
-  localStorage.removeItem(CAL_KEY);
+  saveCalendario([]);
   renderCalendario();
 }
 
@@ -3658,9 +3680,10 @@ function toggleFaq(item) {
 function buildMercatiConsigliati(mercatiCons) {
   if (!mercatiCons || !mercatiCons.length) return '';
   const cards = mercatiCons.map(function(m) {
-    const prio = (m.priorita || 'MEDIA').toLowerCase();
-    const quotaDiv = m.quota_indicativa ? '<div class="cons-quota">Quota indicativa: ' + m.quota_indicativa + '</div>' : '';
-    return '<div class="cons-card ' + prio + '"><span class="cons-badge ' + prio + '">' + (m.priorita || 'MEDIA') + '</span><div class="cons-body"><div class="cons-mercato">📊 ' + m.mercato + '</div><div class="cons-motivo">' + m.motivo + '</div>' + quotaDiv + '</div></div>';
+    const prioRaw = (m.priorita || 'MEDIA').toLowerCase();
+    const prio = ['alta','media','bassa'].includes(prioRaw) ? prioRaw : 'media';
+    const quotaDiv = m.quota_indicativa ? '<div class="cons-quota">Quota indicativa: ' + escapeHtml(m.quota_indicativa) + '</div>' : '';
+    return '<div class="cons-card ' + prio + '"><span class="cons-badge ' + prio + '">' + escapeHtml(m.priorita || 'MEDIA') + '</span><div class="cons-body"><div class="cons-mercato">📊 ' + escapeHtml(m.mercato) + '</div><div class="cons-motivo">' + escapeHtml(m.motivo) + '</div>' + quotaDiv + '</div></div>';
   }).join('');
   return '<div class="mercati-cons-section"><div class="mercati-cons-title">⭐ Mercati Consigliati per questa partita</div><div class="mercati-cons-grid">' + cards + '</div></div>';
 }
@@ -3735,7 +3758,7 @@ function renderStats() {
   let sportHtml = '';
   Object.entries(sportMap).forEach(function([sport, d], i) {
     const pct = d.t > 0 && (d.v+d.p) > 0 ? Math.round(d.v/(d.v+d.p)*100) : 0;
-    sportHtml += '<div class="sport-row"><span class="sport-name">' + sport + '</span><div class="sport-bar-wrap"><div class="sport-bar" style="width:' + pct + '%;background:' + colors[i%colors.length] + '"></div></div><span class="sport-pct">' + pct + '%</span><span class="sport-count">' + d.t + '</span></div>';
+    sportHtml += '<div class="sport-row"><span class="sport-name">' + escapeHtml(sport) + '</span><div class="sport-bar-wrap"><div class="sport-bar" style="width:' + pct + '%;background:' + colors[i%colors.length] + '"></div></div><span class="sport-pct">' + pct + '%</span><span class="sport-count">' + d.t + '</span></div>';
   });
   document.getElementById('sportBars').innerHTML = sportHtml || '<div style="color:var(--muted);font-size:0.82rem">Nessun dato ancora</div>';
 
@@ -3796,10 +3819,10 @@ function renderBiasPanel(history) {
   const wins = verified.filter(function(n) { return n.verifica.esito_scommessa === 'VINTO'; });
   let html = '';
   if (errors.length > 0) {
-    html += '<div class="bias-item"><div class="bias-dot bad"></div><div class="bias-text"><strong>Errori (' + errors.length + '):</strong> ' + errors[0].verifica.nota_apprendimento + '</div></div>';
-    if (errors.length > 1) html += '<div class="bias-item"><div class="bias-dot warn"></div><div class="bias-text"><strong>Pattern:</strong> ' + errors[1].verifica.nota_apprendimento + '</div></div>';
+    html += '<div class="bias-item"><div class="bias-dot bad"></div><div class="bias-text"><strong>Errori (' + errors.length + '):</strong> ' + escapeHtml(errors[0].verifica.nota_apprendimento) + '</div></div>';
+    if (errors.length > 1) html += '<div class="bias-item"><div class="bias-dot warn"></div><div class="bias-text"><strong>Pattern:</strong> ' + escapeHtml(errors[1].verifica.nota_apprendimento) + '</div></div>';
   }
-  if (wins.length > 0) html += '<div class="bias-item"><div class="bias-dot ok"></div><div class="bias-text"><strong>Punti di forza (' + wins.length + '):</strong> ' + wins[0].verifica.nota_apprendimento + '</div></div>';
+  if (wins.length > 0) html += '<div class="bias-item"><div class="bias-dot ok"></div><div class="bias-text"><strong>Punti di forza (' + wins.length + '):</strong> ' + escapeHtml(wins[0].verifica.nota_apprendimento) + '</div></div>';
   if (!html) html = '<div style="color:var(--muted);font-size:0.82rem">Dati insufficienti.</div>';
   document.getElementById('biasPanel').innerHTML = html;
 }
@@ -4232,15 +4255,16 @@ function buildCompactCardDOM(e) {
 
   var btnRicalcola = document.createElement('button');
   btnRicalcola.className = 'btn-verifica';
+  btnRicalcola.id = 'ricalcBtn_' + e.id;
   btnRicalcola.style.cssText = 'background:rgba(99,179,237,0.08);border-color:rgba(99,179,237,0.3);color:#63b3ed;';
   btnRicalcola.textContent = '🔄 RICALCOLA';
-  btnRicalcola.onclick = function() { ricalcolaPronostico(e.id); };
+  btnRicalcola.onclick = function() { ricalcola(e.id); };
   btnRow.appendChild(btnRicalcola);
 
   var btnElimina = document.createElement('button');
   btnElimina.style.cssText = 'margin-left:auto;background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.25);color:var(--danger);border-radius:6px;padding:6px 10px;font-size:0.75rem;cursor:pointer;';
   btnElimina.textContent = '🗑';
-  btnElimina.onclick = function() { eliminaPronostico(e.id); };
+  btnElimina.onclick = function() { deleteEntry(e.id); };
   btnRow.appendChild(btnElimina);
 
   actionsDiv.appendChild(btnRow);
@@ -4295,22 +4319,22 @@ function buildFullDetailHTML(e) {
     : '';
 
   const consiglio = e.consiglio
-    ? '<div class="fd-card wide"><div class="fd-card-title">💡 Consiglio Alternativo</div><div class="fd-card-text">' + e.consiglio + '</div></div>'
+    ? '<div class="fd-card wide"><div class="fd-card-title">💡 Consiglio Alternativo</div><div class="fd-card-text">' + escapeHtml(e.consiglio) + '</div></div>'
     : '';
 
   const lezioniBox = e.lezioni_note
-    ? '<div class="fd-card wide" style="border-color:rgba(255,215,0,0.2);background:rgba(255,215,0,0.03)"><div class="fd-card-title" style="color:var(--gold)">🧠 Lezioni Applicate (' + (e.lezioni_applicate||0) + ')</div><div class="fd-card-text">' + e.lezioni_note + '</div></div>'
+    ? '<div class="fd-card wide" style="border-color:rgba(255,215,0,0.2);background:rgba(255,215,0,0.03)"><div class="fd-card-title" style="color:var(--gold)">🧠 Lezioni Applicate (' + (e.lezioni_applicate||0) + ')</div><div class="fd-card-text">' + escapeHtml(e.lezioni_note) + '</div></div>'
     : '';
 
   let mercatiSection = '';
   if (e.mercati_data && Object.keys(e.mercati_data).length) {
     const cards = Object.entries(e.mercati_data).map(function([key,m],i) {
       return '<div class="mercato-result-card ' + (i===0?'top-pick':'') + '">'
-        + '<div class="mr-label">' + key.replace('mercato_','').replace(/_/g,' ').toUpperCase() + '</div>'
-        + '<div class="mr-pick">' + (m.consiglio||'—') + '</div>'
-        + '<div class="mr-row"><span class="mr-prob">' + (m.probabilita||'?') + '% prob.</span><span class="mr-quota">' + (m.quota_stimata||'?') + '</span></div>'
+        + '<div class="mr-label">' + escapeHtml(key.replace('mercato_','').replace(/_/g,' ').toUpperCase()) + '</div>'
+        + '<div class="mr-pick">' + escapeHtml(m.consiglio||'—') + '</div>'
+        + '<div class="mr-row"><span class="mr-prob">' + (m.probabilita||'?') + '% prob.</span><span class="mr-quota">' + escapeHtml(m.quota_stimata||'?') + '</span></div>'
         + (m.value_bet ? '<div class="mr-value"><span class="value-badge">⚡ VALUE BET</span></div>' : '')
-        + (m.note ? '<div class="mr-note">' + m.note + '</div>' : '')
+        + (m.note ? '<div class="mr-note">' + escapeHtml(m.note) + '</div>' : '')
         + '</div>';
     }).join('');
     mercatiSection = '<div style="margin-bottom:12px"><div class="fd-card-title" style="margin-bottom:10px">📊 Mercati Analizzati</div><div class="mercati-result-grid">' + cards + '</div></div>';
@@ -4324,12 +4348,12 @@ function buildFullDetailHTML(e) {
       + '<div class="cg-header"><span class="cg-title">🎰 Come Giocarla</span>'
       + '<span class="' + (cg.vale_la_pena ? 'cg-vale-si' : 'cg-vale-no') + '">' + (cg.vale_la_pena ? '✅ Vale la pena' : '⚠️ Valuta bene') + '</span></div>'
       + '<div class="cg-steps">'
-      + steps.map(function(s,i){ return '<div class="cg-step"><div class="cg-step-num">' + (i+1) + '</div><div class="cg-step-text">' + s + '</div></div>'; }).join('')
+      + steps.map(function(s,i){ return '<div class="cg-step"><div class="cg-step-num">' + (i+1) + '</div><div class="cg-step-text">' + escapeHtml(s) + '</div></div>'; }).join('')
       + '</div>'
       + '<div class="cg-footer">'
-      + '<div class="cg-info-box"><div class="cg-info-label">🎯 Quota da cercare</div><div class="cg-info-val highlight">' + (cg.quota_da_cercare||'—') + '</div></div>'
-      + '<div class="cg-info-box"><div class="cg-info-label">💰 Quanto mettere</div><div class="cg-info-val">' + (cg.importo_consigliato||'—') + '</div></div>'
-      + '<div class="cg-avvertenza">⚠️ ' + (cg.avvertenza||'') + '</div>'
+      + '<div class="cg-info-box"><div class="cg-info-label">🎯 Quota da cercare</div><div class="cg-info-val highlight">' + escapeHtml(cg.quota_da_cercare||'—') + '</div></div>'
+      + '<div class="cg-info-box"><div class="cg-info-label">💰 Quanto mettere</div><div class="cg-info-val">' + escapeHtml(cg.importo_consigliato||'—') + '</div></div>'
+      + '<div class="cg-avvertenza">⚠️ ' + escapeHtml(cg.avvertenza||'') + '</div>'
       + '</div></div>';
   } else {
     cgSection = '<div style="background:rgba(77,166,255,0.06);border:1px dashed rgba(77,166,255,0.25);border-radius:10px;padding:16px 18px;margin-bottom:12px;display:flex;align-items:center;gap:14px;">'
@@ -4342,7 +4366,7 @@ function buildFullDetailHTML(e) {
   const dateStr = savedAt.toLocaleDateString('it-IT',{day:'2-digit',month:'short',year:'numeric'});
   const timeStr = savedAt.toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'});
 
-  return '<div class="full-detail" id="detail_' + e.id + '">'
+  return '<div class="full-detail open" id="detail_' + e.id + '">'
     + '<div class="full-detail-banner">'
     + '<div class="full-detail-match">' + escapeHtml(e.team1) + ' vs ' + escapeHtml(e.team2) + ' ' + liveBadge + '</div>'
     + '<div class="full-detail-meta">' + escapeHtml(e.sport) + (e.competition?' · '+escapeHtml(e.competition):'') + ' · 📅 ' + escapeHtml(e.matchDate) + ' · 💾 ' + dateStr + ' ' + timeStr + '</div>'
@@ -4355,13 +4379,13 @@ function buildFullDetailHTML(e) {
     + '<div class="fd-odds-cell ' + (e.pronostico==='2'?'rec':'') + '"><div class="fd-odds-label">' + (e.pronostico==='2'?'⭐ ':'') + '2 — Ospite</div><div class="fd-odds-value">' + e.prob2 + '%</div></div>'
     + '</div>'
     + '<div class="fd-pronostico-bar"><div>'
-    + '<div class="fd-bet-main">🎯 ' + e.pronostico + ' — ' + e.descrizione + '</div>'
-    + '<div class="fd-bet-sub">Rischio: <span style="color:' + rc + ';font-weight:600">' + e.rischio + '</span> · Risultato ipotetico: ' + e.risultato_ipotetico + '</div>'
+    + '<div class="fd-bet-main">🎯 ' + escapeHtml(e.pronostico) + ' — ' + escapeHtml(e.descrizione) + '</div>'
+    + '<div class="fd-bet-sub">Rischio: <span style="color:' + rc + ';font-weight:600">' + escapeHtml(e.rischio) + '</span> · Risultato ipotetico: ' + escapeHtml(e.risultato_ipotetico) + '</div>'
     + '</div></div>'
     + '<div class="fd-sections">'
-    + '<div class="fd-card"><div class="fd-card-title">📈 Forma Recente</div><div class="fd-card-text">' + (e.analisi_forma||'—') + '</div></div>'
-    + '<div class="fd-card"><div class="fd-card-title">♟️ Analisi Tattica</div><div class="fd-card-text">' + (e.analisi_tattica||'—') + '</div></div>'
-    + '<div class="fd-card wide"><div class="fd-card-title">🔑 Fattori Chiave</div><div class="fd-card-text">' + (e.fattori_chiave||'—') + '</div></div>'
+    + '<div class="fd-card"><div class="fd-card-title">📈 Forma Recente</div><div class="fd-card-text">' + escapeHtml(e.analisi_forma||'—') + '</div></div>'
+    + '<div class="fd-card"><div class="fd-card-title">♟️ Analisi Tattica</div><div class="fd-card-text">' + escapeHtml(e.analisi_tattica||'—') + '</div></div>'
+    + '<div class="fd-card wide"><div class="fd-card-title">🔑 Fattori Chiave</div><div class="fd-card-text">' + escapeHtml(e.fattori_chiave||'—') + '</div></div>'
     + consiglio + lezioniBox
     + '</div>'
     + mercatiSection
@@ -4387,7 +4411,7 @@ function renderResult(r, team1, team2, competition, webText, showSave, mercati, 
     : '';
 
   const lezioniBox = (r.lezioni_note && memoryCount > 0)
-    ? '<div class="analysis-card full-width" style="border-color:rgba(255,215,0,0.2);background:rgba(255,215,0,0.03)"><div class="card-heading" style="color:var(--gold)">🧠 Come le Lezioni Passate Hanno Influenzato Questo Pronostico</div><div class="analysis-content">' + r.lezioni_note + '</div></div>'
+    ? '<div class="analysis-card full-width" style="border-color:rgba(255,215,0,0.2);background:rgba(255,215,0,0.03)"><div class="card-heading" style="color:var(--gold)">🧠 Come le Lezioni Passate Hanno Influenzato Questo Pronostico</div><div class="analysis-content">' + escapeHtml(r.lezioni_note) + '</div></div>'
     : '';
 
   let mercatiHtml = '';
@@ -4395,21 +4419,21 @@ function renderResult(r, team1, team2, competition, webText, showSave, mercati, 
     const cards = Object.entries(r.mercati).map(function([key, m], i) {
       const isTop = i === 0;
       const valueBadge = m.value_bet
-        ? '<div class="mr-value"><span class="value-badge">⚡ VALUE BET</span>' + (m.quota_bookmaker ? ' <span class="value-score">bk: ' + m.quota_bookmaker + '</span>' : '') + '</div>'
+        ? '<div class="mr-value"><span class="value-badge">⚡ VALUE BET</span>' + (m.quota_bookmaker ? ' <span class="value-score">bk: ' + escapeHtml(m.quota_bookmaker) + '</span>' : '') + '</div>'
         : '';
       return '<div class="mercato-result-card ' + (isTop?'top-pick':'') + '">'
-        + '<div class="mr-label">' + key.replace('mercato_','').replace(/_/g,' ').toUpperCase() + '</div>'
-        + '<div class="mr-pick">' + (m.consiglio||'—') + '</div>'
-        + '<div class="mr-row"><span class="mr-prob">' + (m.probabilita||'?') + '% prob.</span><span class="mr-quota">' + (m.quota_stimata||'?') + '</span></div>'
+        + '<div class="mr-label">' + escapeHtml(key.replace('mercato_','').replace(/_/g,' ').toUpperCase()) + '</div>'
+        + '<div class="mr-pick">' + escapeHtml(m.consiglio||'—') + '</div>'
+        + '<div class="mr-row"><span class="mr-prob">' + (m.probabilita||'?') + '% prob.</span><span class="mr-quota">' + escapeHtml(m.quota_stimata||'?') + '</span></div>'
         + valueBadge
-        + (m.note ? '<div class="mr-note">' + m.note + '</div>' : '')
+        + (m.note ? '<div class="mr-note">' + escapeHtml(m.note) + '</div>' : '')
         + '</div>';
     }).join('');
     mercatiHtml = '<div class="mercati-result-section"><div class="mercati-result-title">📊 Analisi Mercati Selezionati</div><div class="mercati-result-grid">' + cards + '</div></div>';
   }
 
   const valueBetMain = r.value_bet_principale
-    ? '<span class="value-badge" style="margin-left:8px">⚡ VALUE BET' + (r.value_bet_score?' · '+r.value_bet_score:'') + '</span>'
+    ? '<span class="value-badge" style="margin-left:8px">⚡ VALUE BET' + (r.value_bet_score?' · '+escapeHtml(r.value_bet_score):'') + '</span>'
     : '';
 
   let comeGiocarlаHtml = '';
@@ -4420,11 +4444,11 @@ function renderResult(r, team1, team2, competition, webText, showSave, mercati, 
       + '<div class="cg-header"><span class="cg-title">🎰 Come Giocarla</span>'
       + '<span class="' + (cg.vale_la_pena?'cg-vale-si':'cg-vale-no') + '">' + (cg.vale_la_pena?'✅ Vale la pena':'⚠️ Valuta bene') + '</span></div>'
       + '<div class="cg-steps">'
-      + steps.map(function(s,i){ return '<div class="cg-step"><div class="cg-step-num">'+(i+1)+'</div><div class="cg-step-text">'+s+'</div></div>'; }).join('')
+      + steps.map(function(s,i){ return '<div class="cg-step"><div class="cg-step-num">'+(i+1)+'</div><div class="cg-step-text">'+escapeHtml(s)+'</div></div>'; }).join('')
       + '</div><div class="cg-footer">'
-      + '<div class="cg-info-box"><div class="cg-info-label">🎯 Quota da cercare</div><div class="cg-info-val highlight">'+(cg.quota_da_cercare||'—')+'</div></div>'
-      + '<div class="cg-info-box"><div class="cg-info-label">💰 Quanto mettere</div><div class="cg-info-val">'+(cg.importo_consigliato||'—')+'</div></div>'
-      + '<div class="cg-avvertenza">⚠️ '+(cg.avvertenza||'')+'</div>'
+      + '<div class="cg-info-box"><div class="cg-info-label">🎯 Quota da cercare</div><div class="cg-info-val highlight">'+escapeHtml(cg.quota_da_cercare||'—')+'</div></div>'
+      + '<div class="cg-info-box"><div class="cg-info-label">💰 Quanto mettere</div><div class="cg-info-val">'+escapeHtml(cg.importo_consigliato||'—')+'</div></div>'
+      + '<div class="cg-avvertenza">⚠️ '+escapeHtml(cg.avvertenza||'')+'</div>'
       + '</div></div>';
   }
 
@@ -4459,19 +4483,19 @@ function renderResult(r, team1, team2, competition, webText, showSave, mercati, 
     + '<div class="odds-cell ' + (r.pronostico_principale==='2'?'recommended':'') + '"><div class="odds-label">' + (r.pronostico_principale==='2'?'⭐ ':'') + '2 — Ospite</div><div class="odds-value">' + r.probabilita_2 + '%</div><div class="odds-prob">probabilità stimata</div></div>'
     + '</div></div>'
     + '<div class="bet-suggestion"><div>'
-    + '<div class="bet-main">🎯 ' + r.pronostico_principale + ' — ' + r.descrizione_pronostico + valueBetMain + '</div>'
-    + '<div class="bet-desc">Rischio: <span style="color:' + rc + ';font-weight:600">' + r.rischio + '</span> · Ipotetico: ' + r.risultato_esatto_ipotetico + '</div>'
+    + '<div class="bet-main">🎯 ' + escapeHtml(r.pronostico_principale) + ' — ' + escapeHtml(r.descrizione_pronostico) + valueBetMain + '</div>'
+    + '<div class="bet-desc">Rischio: <span style="color:' + rc + ';font-weight:600">' + escapeHtml(r.rischio) + '</span> · Ipotetico: ' + escapeHtml(r.risultato_esatto_ipotetico) + '</div>'
     + '</div>'
-    + '<div><div class="bet-odds-num">' + r.quota_stimata + '</div><div class="bet-odds-label">Quota stimata</div></div>'
+    + '<div><div class="bet-odds-num">' + escapeHtml(r.quota_stimata) + '</div><div class="bet-odds-label">Quota stimata</div></div>'
     + '</div>'
     + mercatiHtml
     + buildMercatiConsigliati(r.mercati_consigliati)
     + comeGiocarlаHtml
     + '<div class="analysis-grid">'
-    + '<div class="analysis-card"><div class="card-heading">📈 Forma Recente</div><div class="analysis-content">' + r.analisi_forma + '</div></div>'
-    + '<div class="analysis-card"><div class="card-heading">♟️ Analisi Tattica</div><div class="analysis-content">' + r.analisi_tattica + '</div></div>'
-    + '<div class="analysis-card full-width"><div class="card-heading">🔑 Fattori Chiave</div><div class="analysis-content">' + r.fattori_chiave + '</div></div>'
-    + (r.consiglio_aggiuntivo ? '<div class="analysis-card full-width"><div class="card-heading">💡 Consiglio Alternativo</div><div class="analysis-content">' + r.consiglio_aggiuntivo + '</div></div>' : '')
+    + '<div class="analysis-card"><div class="card-heading">📈 Forma Recente</div><div class="analysis-content">' + escapeHtml(r.analisi_forma) + '</div></div>'
+    + '<div class="analysis-card"><div class="card-heading">♟️ Analisi Tattica</div><div class="analysis-content">' + escapeHtml(r.analisi_tattica) + '</div></div>'
+    + '<div class="analysis-card full-width"><div class="card-heading">🔑 Fattori Chiave</div><div class="analysis-content">' + escapeHtml(r.fattori_chiave) + '</div></div>'
+    + (r.consiglio_aggiuntivo ? '<div class="analysis-card full-width"><div class="card-heading">💡 Consiglio Alternativo</div><div class="analysis-content">' + escapeHtml(r.consiglio_aggiuntivo) + '</div></div>' : '')
     + lezioniBox
     + webPanel
     + '</div>'
@@ -4592,8 +4616,12 @@ async function verificaRisultato(id) {
     panel.classList.add('visible');
     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
-    // Re-render to update card color
+    // Re-render to update card color, keeping this card expanded so il pannello resta visibile
     renderHistory();
+    const reopenedExpand = document.getElementById('expand_' + id);
+    const reopenedArrow = document.getElementById('arrow_' + id);
+    if (reopenedExpand) reopenedExpand.style.display = 'block';
+    if (reopenedArrow) reopenedArrow.textContent = '▼';
 
   } catch(err) {
     if (!handleApiError(err, null)) {
@@ -4834,7 +4862,7 @@ function renderGiocataResult(sched, picks, singola, combo) {
 
   if (sched.consiglio_generale) {
     html += '<div style="background:rgba(0,229,160,0.06);border:1px solid rgba(0,229,160,0.2);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:0.85rem;">'
-      + '<span style="color:var(--accent);font-weight:600;">💡 Strategia AI: </span>' + sched.consiglio_generale + '</div>';
+      + '<span style="color:var(--accent);font-weight:600;">💡 Strategia AI: </span>' + escapeHtml(sched.consiglio_generale) + '</div>';
   }
 
   if (singola && sched.singola) {
@@ -4843,20 +4871,20 @@ function renderGiocataResult(sched, picks, singola, combo) {
     html += '<div class="g-result-card">'
       + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">'
       + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:1.3rem;letter-spacing:2px;">🏆 Giocata Singola</div>'
-      + '<span style="font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:4px;background:' + riskBg(s.rischio) + ';color:' + riskColor(s.rischio) + ';">' + s.rischio + '</span>'
+      + '<span style="font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:4px;background:' + riskBg(s.rischio) + ';color:' + riskColor(s.rischio) + ';">' + escapeHtml(s.rischio) + '</span>'
       + '</div>'
       + '<div class="g-pick-row">'
-      + '<div class="g-pick-sport">' + (pkRef.sport||'') + ' &bull; ' + (pkRef.competizione||'') + ' &bull; ' + (pkRef.data||'') + '</div>'
-      + '<div class="g-pick-match">' + (s.partita||(pkRef.team1+' vs '+pkRef.team2)) + '</div>'
-      + '<div class="g-pick-bet">&#10003; ' + s.pronostico + '</div>'
+      + '<div class="g-pick-sport">' + escapeHtml(pkRef.sport||'') + ' &bull; ' + escapeHtml(pkRef.competizione||'') + ' &bull; ' + escapeHtml(pkRef.data||'') + '</div>'
+      + '<div class="g-pick-match">' + escapeHtml(s.partita||(pkRef.team1+' vs '+pkRef.team2)) + '</div>'
+      + '<div class="g-pick-bet">&#10003; ' + escapeHtml(s.pronostico) + '</div>'
       + '</div>'
-      + '<div style="font-size:0.82rem;color:var(--muted);margin:10px 0;">' + s.motivazione + '</div>'
+      + '<div style="font-size:0.82rem;color:var(--muted);margin:10px 0;">' + escapeHtml(s.motivazione) + '</div>'
       + '<div class="g-budget-row">'
       + '<div class="g-budget-item"><div class="g-budget-val">&#8364;' + parseFloat(s.importo_consigliato).toFixed(2) + '</div><div class="g-budget-lbl">Da puntare</div></div>'
       + '<div class="g-budget-item"><div class="g-budget-val">' + parseFloat(s.quota).toFixed(2) + '</div><div class="g-budget-lbl">Quota</div></div>'
       + '<div class="g-budget-item"><div class="g-budget-val" style="color:var(--gold);">&#8364;' + parseFloat(s.vincita_potenziale).toFixed(2) + '</div><div class="g-budget-lbl">Vincita netta</div></div>'
       + '</div>'
-      + '<div style="margin-top:12px;font-size:0.73rem;color:var(--muted);background:rgba(255,215,0,0.05);border-radius:6px;padding:8px 10px;">&#9888;&#65039; ' + s.avvertenza + '</div>'
+      + '<div style="margin-top:12px;font-size:0.73rem;color:var(--muted);background:rgba(255,215,0,0.05);border-radius:6px;padding:8px 10px;">&#9888;&#65039; ' + escapeHtml(s.avvertenza) + '</div>'
       + '</div>';
   }
 
@@ -4864,23 +4892,23 @@ function renderGiocataResult(sched, picks, singola, combo) {
     var c = sched.combinata;
     var pHtml = (c.picks||[]).map(function(pk){
       return '<div class="g-pick-row" style="margin-bottom:6px;">'
-        + '<div class="g-pick-match">' + pk.partita + '</div>'
-        + '<div class="g-pick-bet">&#10003; ' + pk.pronostico + ' <span style="color:var(--muted);font-size:0.75rem;">@ ' + parseFloat(pk.quota).toFixed(2) + '</span></div>'
+        + '<div class="g-pick-match">' + escapeHtml(pk.partita) + '</div>'
+        + '<div class="g-pick-bet">&#10003; ' + escapeHtml(pk.pronostico) + ' <span style="color:var(--muted);font-size:0.75rem;">@ ' + parseFloat(pk.quota).toFixed(2) + '</span></div>'
         + '</div>';
     }).join('');
     html += '<div class="g-result-card">'
       + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">'
       + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:1.3rem;letter-spacing:2px;">&#128279; Combinata</div>'
-      + '<span style="font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:4px;background:' + riskBg(c.rischio) + ';color:' + riskColor(c.rischio) + ';">' + c.rischio + '</span>'
+      + '<span style="font-size:0.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border-radius:4px;background:' + riskBg(c.rischio) + ';color:' + riskColor(c.rischio) + ';">' + escapeHtml(c.rischio) + '</span>'
       + '</div>'
       + pHtml
-      + '<div style="font-size:0.82rem;color:var(--muted);margin:10px 0;">' + c.motivazione + '</div>'
+      + '<div style="font-size:0.82rem;color:var(--muted);margin:10px 0;">' + escapeHtml(c.motivazione) + '</div>'
       + '<div class="g-budget-row">'
       + '<div class="g-budget-item"><div class="g-budget-val">&#8364;' + parseFloat(c.importo_consigliato).toFixed(2) + '</div><div class="g-budget-lbl">Da puntare</div></div>'
       + '<div class="g-budget-item"><div class="g-budget-val">' + parseFloat(c.quota_totale).toFixed(2) + '</div><div class="g-budget-lbl">Quota totale</div></div>'
       + '<div class="g-budget-item"><div class="g-budget-val" style="color:var(--gold);">&#8364;' + parseFloat(c.vincita_potenziale).toFixed(2) + '</div><div class="g-budget-lbl">Vincita netta</div></div>'
       + '</div>'
-      + '<div style="margin-top:12px;font-size:0.73rem;color:var(--muted);background:rgba(255,215,0,0.05);border-radius:6px;padding:8px 10px;">&#9888;&#65039; ' + c.avvertenza + '</div>'
+      + '<div style="margin-top:12px;font-size:0.73rem;color:var(--muted);background:rgba(255,215,0,0.05);border-radius:6px;padding:8px 10px;">&#9888;&#65039; ' + escapeHtml(c.avvertenza) + '</div>'
       + '</div>';
   }
 
@@ -4889,15 +4917,15 @@ function renderGiocataResult(sched, picks, singola, combo) {
     + picks.map(function(pk){
         return '<div class="g-pick-row" style="margin-bottom:8px;">'
           + '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;">'
-          + '<div><div class="g-pick-sport">' + pk.sport + ' &bull; ' + pk.competizione + '</div>'
-          + '<div class="g-pick-match">' + pk.team1 + ' vs ' + pk.team2 + '</div>'
-          + '<div class="g-pick-bet">' + pk.pronostico + '</div></div>'
+          + '<div><div class="g-pick-sport">' + escapeHtml(pk.sport) + ' &bull; ' + escapeHtml(pk.competizione) + '</div>'
+          + '<div class="g-pick-match">' + escapeHtml(pk.team1) + ' vs ' + escapeHtml(pk.team2) + '</div>'
+          + '<div class="g-pick-bet">' + escapeHtml(pk.pronostico) + '</div></div>'
           + '<div style="text-align:right;flex-shrink:0;">'
-          + '<div style="font-family:\'DM Mono\',monospace;font-size:0.9rem;font-weight:600;">' + (pk.quota_reale||pk.quota_stimata) + '</div>'
+          + '<div style="font-family:\'DM Mono\',monospace;font-size:0.9rem;font-weight:600;">' + escapeHtml(pk.quota_reale||pk.quota_stimata) + '</div>'
           + '<div style="font-size:0.7rem;color:var(--muted);">Conf. ' + (pk.confidenza_aggiornata||pk.confidenza) + '%</div>'
-          + '<div style="font-size:0.68rem;font-weight:600;color:' + riskColor(pk.rischio_aggiornato||pk.rischio) + ';">' + (pk.rischio_aggiornato||pk.rischio) + '</div>'
+          + '<div style="font-size:0.68rem;font-weight:600;color:' + riskColor(pk.rischio_aggiornato||pk.rischio) + ';">' + escapeHtml(pk.rischio_aggiornato||pk.rischio) + '</div>'
           + '</div></div>'
-          + '<div style="font-size:0.75rem;color:var(--muted);margin-top:4px;">' + (pk.note||pk.motivo||'') + '</div>'
+          + '<div style="font-size:0.75rem;color:var(--muted);margin-top:4px;">' + escapeHtml(pk.note||pk.motivo||'') + '</div>'
           + '</div>';
       }).join('')
     + '</div>';
