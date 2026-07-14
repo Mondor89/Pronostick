@@ -2457,6 +2457,14 @@ function getModel() {
   return localStorage.getItem('pronostick_model') || 'claude-haiku-4-5-20251001';
 }
 
+// web_search_20260209 (dynamic filtering, più efficiente) è supportato solo da alcuni modelli.
+// Modelli non presenti in questa lista (es. Haiku 4.5, Sonnet 4.5) usano la variante base 20250305.
+const WEB_SEARCH_DYNAMIC_MODELS = ['claude-sonnet-5', 'claude-opus-4-8'];
+function getWebSearchTool() {
+  const type = WEB_SEARCH_DYNAMIC_MODELS.includes(getModel()) ? 'web_search_20260209' : 'web_search_20250305';
+  return { type, name: 'web_search' };
+}
+
 function updateApiKeyUI() {
   const key = getApiKey();
   const card = document.getElementById('apikeyCard');
@@ -2772,7 +2780,7 @@ function buildFileContext() {
 async function fetchWebData(team1, team2, competition, sport, matchDate) {
   try {
     const userMsg = 'Oggi è ' + new Date().toLocaleDateString('it-IT') + '. Cerca informazioni aggiornate su questa partita di ' + sport + ': ' + team1 + ' vs ' + team2 + (competition ? ' - ' + competition : '') + (matchDate ? ' del ' + matchDate : '') + '.\nCerca: forma recente ultime 5 partite, infortuni/squalifiche, quote bookmaker 1X2 e Over/Under, notizie rilevanti.\nRiassumi in italiano in modo strutturato.';
-    const tools = [{type:"web_search_20250305",name:"web_search"}];
+    const tools = [getWebSearchTool()];
     let messages = [{role:"user",content:userMsg}];
     let finalText = '';
     let iterations = 0;
@@ -3360,7 +3368,7 @@ async function cercaPartite() {
     + '}';
 
   try {
-    const tools = [{ type: 'web_search_20250305', name: 'web_search' }];
+    const tools = [getWebSearchTool()];
     const messages = [{ role: 'user', content: prompt }];
     let iterations = 0;
     let finalText = '';
@@ -4420,7 +4428,7 @@ async function verificaRisultato(id) {
   let risultatoWeb = '';
   try {
     const query = 'risultato finale ' + entry.team1 + ' vs ' + entry.team2 + ' ' + (entry.competition||'') + ' ' + entry.matchDate;
-    const tools = [{ type: "web_search_20250305", name: "web_search" }];
+    const tools = [getWebSearchTool()];
     let messages = [{
       role: "user",
       content: 'Cerca il risultato finale della partita: ' + entry.team1 + ' vs ' + entry.team2 + (entry.competition ? ' - ' + entry.competition : '') + ' del ' + entry.matchDate + '.\nTrova il punteggio esatto finale. Riporta solo i fatti: risultato, marcatori se disponibili, eventuali note importanti sulla partita.'
@@ -4601,7 +4609,7 @@ function riskBg(r)    { return r==='BASSO'?'rgba(0,229,160,0.1)':r==='MEDIO'?'rg
 
 async function callProxy(messages, useWebSearch, maxTokens) {
   var body = { model: getModel(), max_tokens: maxTokens || 2000, messages: messages };
-  if (useWebSearch) body.tools = [{ type:'web_search_20250305', name:'web_search' }];
+  if (useWebSearch) body.tools = [getWebSearchTool()];
   var r = await fetch('/api/proxy', {
     method:'POST',
     headers:{'Content-Type':'application/json','x-api-key':getApiKey()},
