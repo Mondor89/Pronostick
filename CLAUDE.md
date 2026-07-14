@@ -234,6 +234,7 @@ Se `index.html` dovesse superare le ~6000 righe o servissero più pagine distint
 
 ## Checklist pre-commit [UNIVERSALE]
 
+- [ ] Eseguito `scripts/check-known-bug-patterns.sh index.html` (controllo euristico dei pattern-trappola documentati sotto — falsi positivi possibili, verificare a mano)
 - [ ] Nessun errore in console del browser
 - [ ] Testato manualmente il flusso principale
 - [ ] Nessun `console.log`/debug dimenticato
