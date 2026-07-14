@@ -6,6 +6,7 @@
 <title>PRONOSTICK — Analisi Sportiva Intelligente</title>
 <meta name="description" content="Pronosticatore sportivo con intelligenza artificiale. Analisi live, value bet e storico partite.">
 <meta name="theme-color" content="#00e5a0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -30,18 +31,6 @@ header{padding:40px 0 30px;border-bottom:1px solid var(--border);margin-bottom:4
 .tagline{color:var(--muted);font-size:0.9rem;font-weight:300;}
 
 /* API KEY SETUP */
-.apikey-card {
-  background: linear-gradient(135deg, rgba(0,229,160,0.06), rgba(77,166,255,0.04));
-  border: 2px solid rgba(0,229,160,0.3);
-  border-radius: 12px;
-  padding: 22px 24px;
-  margin-bottom: 32px;
-  position: relative;
-}
-.apikey-card.configured {
-  background: rgba(0,229,160,0.04);
-  border-color: rgba(0,229,160,0.15);
-}
 .apikey-title {
   font-family: 'Bebas Neue', sans-serif;
   font-size: 1rem; letter-spacing: 2px; color: var(--text);
@@ -205,18 +194,6 @@ textarea{resize:vertical;min-height:80px;}
 .storico-empty{text-align:center;padding:40px 20px;color:var(--muted);font-size:0.9rem;border:1px dashed var(--border);border-radius:10px;}
 .storico-list{display:flex;flex-direction:column;gap:16px;}
 
-/* Single history card */
-.hcard{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:border-color 0.2s;}
-.hcard.vinto{border-color:rgba(0,229,160,0.4);}
-.hcard.perso{border-color:rgba(255,71,87,0.35);}
-.hcard.pareggio{border-color:rgba(255,215,0,0.35);}
-
-.hcard-top{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;cursor:pointer;}
-.hcard-left{flex:1;}
-.hcard-match{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1px;margin-bottom:2px;}
-.hcard-meta{font-size:0.75rem;color:var(--muted);font-family:monospace;display:flex;gap:10px;flex-wrap:wrap;}
-.hcard-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-
 /* Status badge */
 .status-badge{font-size:0.7rem;font-weight:700;letter-spacing:1.5px;padding:4px 12px;border-radius:20px;text-transform:uppercase;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;}
 .status-attesa{background:rgba(255,215,0,0.12);color:var(--gold);border:1px solid rgba(255,215,0,0.3);}
@@ -231,9 +208,6 @@ textarea{resize:vertical;min-height:80px;}
 .hcard.combinata-selected { outline: 2px solid var(--accent3); outline-offset: 2px; cursor: pointer; }
 .hcard.combinata-mode { cursor: pointer; }
 .hcard.combinata-mode:hover { outline: 1px solid rgba(77,166,255,0.4); outline-offset: 2px; }
-.btn-ricalcolo{background:rgba(77,166,255,0.1);color:var(--accent3);border:1px solid rgba(77,166,255,0.3);border-radius:6px;padding:8px 16px;font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;}
-.btn-ricalcolo:hover{background:rgba(77,166,255,0.2);}
-.btn-ricalcolo:disabled{opacity:0.4;cursor:not-allowed;}
 .btn-delete{background:rgba(255,71,87,0.08);color:var(--danger);border:1px solid rgba(255,71,87,0.2);border-radius:6px;padding:8px 14px;font-family:'DM Sans',sans-serif;font-size:0.8rem;cursor:pointer;transition:all 0.2s;}
 .btn-delete:hover{background:rgba(255,71,87,0.15);}
 
@@ -256,8 +230,6 @@ textarea{resize:vertical;min-height:80px;}
 .status-option{padding:8px 16px;border-radius:5px;font-size:0.8rem;font-weight:600;cursor:pointer;border:none;text-align:left;background:transparent;font-family:'DM Sans',sans-serif;transition:background 0.15s;}
 .status-option:hover{background:var(--surface2);}
 
-.hcard-detail{padding:0 20px 16px;display:none;}
-.hcard-detail.open{display:block;}
 .detail-text{font-size:0.82rem;color:var(--muted);line-height:1.6;background:var(--surface2);border-radius:6px;padding:12px;max-height:150px;overflow-y:auto;}
 
 /* Full detail expanded card */
@@ -620,9 +592,6 @@ textarea{resize:vertical;min-height:80px;}
 @media(max-width:600px){
   .mercati-grid { grid-template-columns: 1fr; }
   .mercati-result-grid { grid-template-columns: 1fr; }
-}
-
-@media(max-width:600px){
   .teams-row{grid-template-columns:1fr;}.vs-badge{display:none;}
   .form-row{grid-template-columns:1fr;}.odds-grid{grid-template-columns:1fr;}
   .analysis-grid{grid-template-columns:1fr;}.logo-text{font-size:2rem;}
@@ -954,11 +923,12 @@ textarea{resize:vertical;min-height:80px;}
 @media (min-width: 641px) { .tab-bar { display: none !important; } body { padding-bottom: 20px; } }
 
 /* ===== TAB BAR NAVIGATION ===== */
-body { padding-bottom: 70px; } /* space for tab bar */
+body { padding-bottom: calc(70px + env(safe-area-inset-bottom)); } /* space for tab bar */
 .tab-bar {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
   background: var(--surface); border-top: 1px solid var(--border);
   display: flex; height: 62px;
+  padding-bottom: env(safe-area-inset-bottom);
   box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
 }
 .tab-item {
@@ -1022,6 +992,10 @@ body { padding-bottom: 70px; } /* space for tab bar */
 .settings-card {
   background: var(--surface); border: 1px solid var(--border);
   border-radius: 12px; padding: 18px; margin-bottom: 10px;
+}
+#apikeyCard.configured {
+  background: rgba(0,229,160,0.04);
+  border-color: rgba(0,229,160,0.3);
 }
 
 /* ===== GIOCATA CONSIGLIATA ===== */
@@ -1235,7 +1209,7 @@ body { padding-bottom: 70px; } /* space for tab bar */
         <span class="cost-item" id="costCercaWrap" style="opacity:0.35;">📋 Cerca quote: <strong id="costCerca">$0.00</strong></span>
         <span class="cost-total" id="costTotal">≈ $0.14</span>
       </div>
-      <a class="cost-billing-link" href="https://console.anthropic.com/settings/billing" target="_blank">
+      <a class="cost-billing-link" href="https://console.anthropic.com/settings/billing" target="_blank" rel="noopener">
         💳 Controlla credito residuo →
       </a>
     </div>
@@ -1641,7 +1615,7 @@ body { padding-bottom: 70px; } /* space for tab bar */
     <div class="guida-card">
       <div class="guida-card-title">💾 Backup</div>
       <div class="guida-card-text">
-        Dal pulsante 💾 Backup (Storico o Menu) puoi esportare tutto lo storico in un file JSON e reimportarlo — utile per un backup manuale o per spostare i dati su un altro dispositivo senza dover usare l'account Google.
+        Dal pulsante 💾 Backup (Storico o Menu) puoi esportare storico pronostici e calendario partite in un file JSON e reimportarli — utile per un backup manuale o per spostare i dati su un altro dispositivo senza dover usare l'account Google.
       </div>
     </div>
   </div>
@@ -1717,7 +1691,7 @@ body { padding-bottom: 70px; } /* space for tab bar */
     <div class="apikey-status missing" id="apikeyStatus" style="margin-top:8px;">⚠️ API key non configurata</div>
     <button id="testApiKeyBtn" onclick="testApiKey()" style="margin-top:10px;width:100%;background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:9px 14px;font-family:'DM Sans',sans-serif;font-size:0.83rem;cursor:pointer;transition:all 0.2s;display:none;">🧪 Testa chiave</button>
     <div id="testApiKeyStatus" style="display:none;margin-top:8px;font-size:0.8rem;font-family:monospace;padding:8px 12px;border-radius:6px;"></div>
-    <a class="apikey-link" href="https://console.anthropic.com/keys" target="_blank" style="margin-top:6px;display:inline-block;">→ Ottieni la tua API key</a>
+    <a class="apikey-link" href="https://console.anthropic.com/keys" target="_blank" rel="noopener" style="margin-top:6px;display:inline-block;">→ Ottieni la tua API key</a>
   </div>
 
   <div class="settings-card" style="margin-bottom:16px;">
@@ -1733,10 +1707,10 @@ body { padding-bottom: 70px; } /* space for tab bar */
   <div style="font-size:0.62rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Strumenti</div>
   <div onclick="openBackupModal()" style="display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;cursor:pointer;">
     <span style="font-size:1.3rem;">💾</span>
-    <div style="flex:1;"><div style="font-size:0.9rem;font-weight:600;color:var(--text);">Backup Storico</div><div style="font-size:0.75rem;color:var(--muted);">Esporta o importa i tuoi pronostici</div></div>
+    <div style="flex:1;"><div style="font-size:0.9rem;font-weight:600;color:var(--text);">Backup</div><div style="font-size:0.75rem;color:var(--muted);">Esporta o importa pronostici e calendario</div></div>
     <span style="color:var(--muted);">›</span>
   </div>
-  <a href="https://console.anthropic.com/settings/billing" target="_blank" style="display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;text-decoration:none;">
+  <a href="https://console.anthropic.com/settings/billing" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:8px;text-decoration:none;">
     <span style="font-size:1.3rem;">💳</span>
     <div style="flex:1;"><div style="font-size:0.9rem;font-weight:600;color:var(--text);">Credito Anthropic</div><div style="font-size:0.75rem;color:var(--muted);">Controlla il tuo saldo API</div></div>
     <span style="color:var(--muted);">↗</span>
@@ -1766,9 +1740,9 @@ body { padding-bottom: 70px; } /* space for tab bar */
 
     <!-- EXPORT TAB -->
     <div id="backupTabExport">
-      <div class="export-modal-title">💾 Backup Storico</div>
+      <div class="export-modal-title">💾 Backup</div>
       <div class="export-modal-sub" style="margin-bottom:16px">
-        Salva una copia del tuo storico pronostici.
+        Salva una copia dello storico pronostici e del calendario partite.
       </div>
 
       <button onclick="shareWhatsApp()" style="width:100%;background:#25D366;color:#fff;border:none;border-radius:10px;padding:16px;font-family:'Bebas Neue',sans-serif;font-size:1.05rem;letter-spacing:2px;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:10px;">
@@ -2427,7 +2401,7 @@ async function fetchQuoteBookmaker(team1, team2, competition, sport, bookmaker) 
     + ' "1x": "numero o null", "x2": "numero o null",'
     + ' "handicap": "descrizione o null",'
     + ' "altri": "altri mercati trovati come stringa o null" } }';
-  const rawText = await runWithWebSearch(prompt, 3);
+  const rawText = await runWithWebSearch(prompt);
   return parseJSON(rawText);
 }
 
@@ -2832,6 +2806,7 @@ function renderChips() {
     const delBtn = document.createElement('button');
     delBtn.className = 'chip-del';
     delBtn.textContent = '✕';
+    delBtn.setAttribute('aria-label', 'Rimuovi file ' + f.name);
     delBtn.onclick = function() { removeFile(f.name); };
 
     chip.appendChild(nameSpan);
@@ -2851,22 +2826,12 @@ async function fetchWebData(team1, team2, competition, sport, matchDate) {
   try {
     const userMsg = 'Oggi è ' + new Date().toLocaleDateString('it-IT') + '. Cerca informazioni aggiornate su questa partita di ' + sport + ': ' + team1 + ' vs ' + team2 + (competition ? ' - ' + competition : '') + (matchDate ? ' del ' + matchDate : '') + '.\nCerca: forma recente ultime 5 partite, infortuni/squalifiche, quote bookmaker 1X2 e Over/Under, notizie rilevanti.\nRiassumi in italiano in modo strutturato.';
     const tools = [getWebSearchTool()];
-    let messages = [{role:"user",content:userMsg}];
+    const messages = [{role:"user",content:userMsg}];
+    const res = await fetch("/api/proxy",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getApiKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:getModel(),max_tokens:1200,tools,messages})});
+    const data = await res.json();
+    if (!res.ok) return {text:''};
     let finalText = '';
-    let iterations = 0;
-    while (iterations < 3) {
-      iterations++;
-      const res = await fetch("/api/proxy",{method:"POST",headers:{"Content-Type":"application/json","x-api-key":getApiKey(),"anthropic-version":"2023-06-01","anthropic-dangerous-direct-browser-access":"true"},body:JSON.stringify({model:getModel(),max_tokens:1200,tools,messages})});
-      const data = await res.json();
-      if (!res.ok) break;
-      const assistantContent = data.content || [];
-      messages.push({role:"assistant",content:assistantContent});
-      for (const block of assistantContent) { if (block.type==='text'&&block.text) finalText+=block.text+'\n'; }
-      const toolUseBlocks = assistantContent.filter(b=>b.type==='tool_use');
-      if (!toolUseBlocks.length) break;
-      const toolResults = toolUseBlocks.map(tu=>({type:"tool_result",tool_use_id:tu.id,content:'Ricerca eseguita per: "' + (tu.input?.query || '') + '". Procedi con il riassunto.'}));
-      messages.push({role:"user",content:toolResults});
-    }
+    for (const block of (data.content || [])) { if (block.type==='text'&&block.text) finalText+=block.text+'\n'; }
     return {text:finalText.trim()};
   } catch(e) { return {text:''}; }
 }
@@ -3440,31 +3405,16 @@ async function cercaPartite() {
   try {
     const tools = [getWebSearchTool()];
     const messages = [{ role: 'user', content: prompt }];
-    let iterations = 0;
-    let finalText = '';
-    let msgs = [...messages];
 
-    while (iterations < 6) {
-      iterations++;
-      const res = await fetch('/api/proxy', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey() },
-        body: JSON.stringify({ model: getModel(), max_tokens: 2000, tools, messages: msgs })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error?.message || 'Errore');
-      const assistantContent = data.content || [];
-      msgs.push({ role: 'assistant', content: assistantContent });
-      const toolUses = assistantContent.filter(b => b.type === 'tool_use');
-      const texts = assistantContent.filter(b => b.type === 'text').map(b => b.text).join('');
-      if (texts) finalText = texts;
-      if (!toolUses.length) break;
-      const toolResults = toolUses.map(t => ({
-        type: 'tool_result', tool_use_id: t.id,
-        content: 'Cerca risultati per: ' + t.input.query
-      }));
-      msgs.push({ role: 'user', content: toolResults });
-    }
+    const res = await fetch('/api/proxy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': getApiKey() },
+      body: JSON.stringify({ model: getModel(), max_tokens: 2000, tools, messages })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error?.message || 'Errore');
+    const assistantContent = data.content || [];
+    const finalText = assistantContent.filter(b => b.type === 'text').map(b => b.text).join('');
 
     if (!finalText) throw new Error('Nessuna risposta dal modello');
     const t = finalText.trim();
@@ -3548,11 +3498,11 @@ function renderCalendario() {
         + '</div>'
         + (isPastMatch ? '<div style="display:flex;align-items:center;gap:8px;">'
           + '<span style="font-size:0.7rem;color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:3px 8px;">Passata</span>'
-          + '<button onclick="rimuoviDalCalendario(\'' + p.id + '\')" style="background:rgba(255,71,87,0.08);color:var(--danger);border:1px solid rgba(255,71,87,0.2);border-radius:7px;padding:8px 10px;font-size:0.8rem;cursor:pointer;">🗑</button>'
+          + '<button onclick="rimuoviDalCalendario(\'' + p.id + '\')" aria-label="Rimuovi partita ' + escapeHtml(p.team1) + ' vs ' + escapeHtml(p.team2) + '" style="background:rgba(255,71,87,0.08);color:var(--danger);border:1px solid rgba(255,71,87,0.2);border-radius:7px;padding:8px 10px;font-size:0.8rem;cursor:pointer;">🗑</button>'
           + '</div>'
           : '<div style="display:flex;gap:8px;">'
           + '<button onclick="analizzaDalCalendario(\'' + p.id + '\')" style="background:var(--accent);color:var(--bg);border:none;border-radius:7px;padding:8px 14px;font-family:\'Bebas Neue\',sans-serif;font-size:0.82rem;letter-spacing:1px;cursor:pointer;">⚡ ANALIZZA</button>'
-          + '<button onclick="rimuoviDalCalendario(\'' + p.id + '\')" style="background:rgba(255,71,87,0.08);color:var(--danger);border:1px solid rgba(255,71,87,0.2);border-radius:7px;padding:8px 10px;font-size:0.8rem;cursor:pointer;">🗑</button>'
+          + '<button onclick="rimuoviDalCalendario(\'' + p.id + '\')" aria-label="Rimuovi partita ' + escapeHtml(p.team1) + ' vs ' + escapeHtml(p.team2) + '" style="background:rgba(255,71,87,0.08);color:var(--danger);border:1px solid rgba(255,71,87,0.2);border-radius:7px;padding:8px 10px;font-size:0.8rem;cursor:pointer;">🗑</button>'
           + '</div>')
         + '</div>'
         + '</div>';
@@ -3779,6 +3729,10 @@ function renderStats() {
 function renderRoiChart(history) {
   const canvas = document.getElementById('roiChart');
   if (!canvas) return;
+  if (typeof Chart === 'undefined') {
+    canvas.parentElement.innerHTML = '<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:30px 0">⚠️ Libreria grafici non disponibile (controlla la connessione) — le altre statistiche restano visibili sopra.</div>';
+    return;
+  }
   if (roiChartInstance) { roiChartInstance.destroy(); roiChartInstance = null; }
   const entries = history
     .filter(function(e) { return (e.status === 'vinto' || e.status === 'perso') && parseFloat(e.importo_giocato) > 0; })
@@ -3792,7 +3746,7 @@ function renderRoiChart(history) {
   const data = [0];
   entries.forEach(function(e) {
     const imp = parseFloat(e.importo_giocato);
-    if (e.status === 'vinto') cumulative += imp * (parseFloat(e.quota)||1) - imp;
+    if (e.status === 'vinto') cumulative += imp * (parseFloat(e.quota_reale) || parseFloat(e.quota) || 1) - imp;
     else cumulative -= imp;
     labels.push(e.team1.slice(0,3) + '-' + e.team2.slice(0,3));
     data.push(parseFloat(cumulative.toFixed(2)));
@@ -3841,13 +3795,15 @@ function showImportTab() {
 
 function getBackupJSON() {
   const history = loadHistory();
-  if (!history.length) { showToast('⚠️ Nessun pronostico da esportare', 'error'); return null; }
-  return JSON.stringify({ version: '3.0', exportedAt: new Date().toISOString(), count: history.length, data: history }, null, 2);
+  const calendario = loadCalendario();
+  if (!history.length && !calendario.length) { showToast('⚠️ Nessun dato da esportare', 'error'); return null; }
+  return JSON.stringify({ version: '3.1', exportedAt: new Date().toISOString(), count: history.length, data: history, calendario: calendario }, null, 2);
 }
 
 function shareWhatsApp() {
   const history = loadHistory();
-  if (!history.length) { showToast('⚠️ Nessun pronostico da esportare', 'error'); return; }
+  const calendario = loadCalendario();
+  if (!history.length && !calendario.length) { showToast('⚠️ Nessun dato da esportare', 'error'); return; }
   const json = getBackupJSON();
   const date = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'}).replace(/\//g,'-');
   const filename = 'pronostick_backup_' + date + '.json';
@@ -3905,19 +3861,40 @@ function processImport(raw) {
   try {
     const parsed = JSON.parse(raw);
     const incoming = Array.isArray(parsed) ? parsed : (parsed.data || []);
-    if (!incoming.length) { showToast('⚠️ Nessun dato trovato', 'error'); return; }
-    const existing = loadHistory();
-    const existingIds = new Set(existing.map(function(e) { return e.id; }));
-    const merged = existing.slice();
+    const incomingCal = Array.isArray(parsed) ? [] : (parsed.calendario || []);
+    if (!incoming.length && !incomingCal.length) { showToast('⚠️ Nessun dato trovato', 'error'); return; }
+
     let added = 0;
-    incoming.forEach(function(entry) {
-      if (!existingIds.has(entry.id)) { merged.push(entry); added++; }
-    });
-    merged.sort(function(a, b) { return new Date(b.savedAt) - new Date(a.savedAt); });
-    saveHistory(merged);
-    renderHistory();
+    if (incoming.length) {
+      const existing = loadHistory();
+      const existingIds = new Set(existing.map(function(e) { return e.id; }));
+      const merged = existing.slice();
+      incoming.forEach(function(entry) {
+        if (!existingIds.has(entry.id)) { merged.push(entry); added++; }
+      });
+      merged.sort(function(a, b) { return new Date(b.savedAt) - new Date(a.savedAt); });
+      saveHistory(merged);
+      renderHistory();
+    }
+
+    let addedCal = 0;
+    if (incomingCal.length) {
+      const existingCal = loadCalendario();
+      const existingCalKeys = new Set(existingCal.map(function(p) { return p.team1 + '|' + p.team2 + '|' + p.data; }));
+      const mergedCal = existingCal.slice();
+      incomingCal.forEach(function(p) {
+        const key = p.team1 + '|' + p.team2 + '|' + p.data;
+        if (!existingCalKeys.has(key)) { mergedCal.push(p); addedCal++; }
+      });
+      saveCalendario(mergedCal);
+      renderCalendario();
+    }
+
     closeBackupModal();
-    showToast(added > 0 ? '✅ Importati ' + added + ' pronostici' : 'ℹ️ Tutti già presenti', 'success');
+    const parts = [];
+    if (added > 0) parts.push(added + ' pronostici');
+    if (addedCal > 0) parts.push(addedCal + ' partite calendario');
+    showToast(parts.length ? '✅ Importati ' + parts.join(' + ') : 'ℹ️ Tutti già presenti', 'success');
   } catch(err) {
     showToast('❌ File non valido', 'error');
   }
@@ -4113,6 +4090,7 @@ function buildCompactCardDOM(e) {
   statusBtn.dataset.id = e.id;
   statusBtn.style.cssText = 'font-size:0.65rem;padding:3px 8px;';
   statusBtn.textContent = statusIcon;
+  statusBtn.setAttribute('aria-label', 'Stato: ' + e.status + ' — clicca per cambiare');
   statusBtn.onclick = function(ev) { ev.stopPropagation(); openStatusPicker(e.id, statusBtn); };
 
   var arrowSpan = document.createElement('span');
@@ -4264,6 +4242,7 @@ function buildCompactCardDOM(e) {
   var btnElimina = document.createElement('button');
   btnElimina.style.cssText = 'margin-left:auto;background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.25);color:var(--danger);border-radius:6px;padding:6px 10px;font-size:0.75rem;cursor:pointer;';
   btnElimina.textContent = '🗑';
+  btnElimina.setAttribute('aria-label', 'Elimina pronostico ' + e.team1 + ' vs ' + e.team2);
   btnElimina.onclick = function() { deleteEntry(e.id); };
   btnRow.appendChild(btnElimina);
 
@@ -4295,14 +4274,9 @@ function toggleCardExpand(id) {
   }
 }
 
-function handleCardClick(id) {
-  toggleCardExpand(id);
-}
-
 function toggleDetail(id) {
   const el = document.getElementById('detail_'+id);
-  console.log('toggleDetail called:', id, 'el:', el);
-  if (!el) { console.warn('detail element not found for id:', id); return; }
+  if (!el) return;
   const isOpen = el.classList.contains('open');
   document.querySelectorAll('.full-detail.open').forEach(d => d.classList.remove('open'));
   if (!isOpen) el.classList.add('open');
@@ -4456,7 +4430,7 @@ function renderResult(r, team1, team2, competition, webText, showSave, mercati, 
   const calcHtml = showSave
     ? '<div class="calc-card"><div class="calc-title">💰 Calcolatore Giocata</div>'
       + '<div class="calc-row"><div class="calc-input-wrap"><label>Importo €</label>'
-      + '<input type="number" class="calc-input" id="calcImporto" value="10" min="1" step="1" oninput="aggiornaCalc(' + quota + ')"/></div>'
+      + '<input type="number" class="calc-input" id="calcImporto" placeholder="es. 10" min="1" step="1" oninput="aggiornaCalc(' + quota + ')"/></div>'
       + '<div class="calc-results">'
       + '<div class="calc-result-item"><span class="calc-result-label">Quota</span><span class="calc-result-val" style="color:var(--text)">' + quota.toFixed(2) + '</span></div>'
       + '<div class="calc-result-item"><span class="calc-result-label">Vincita totale</span><span class="calc-result-val" style="color:var(--accent)" id="calcVincita">€' + (10*quota).toFixed(2) + '</span></div>'
@@ -4520,27 +4494,18 @@ async function verificaRisultato(id) {
   // Web search per il risultato reale
   let risultatoWeb = '';
   try {
-    const query = 'risultato finale ' + entry.team1 + ' vs ' + entry.team2 + ' ' + (entry.competition||'') + ' ' + entry.matchDate;
     const tools = [getWebSearchTool()];
-    let messages = [{
+    const messages = [{
       role: "user",
       content: 'Cerca il risultato finale della partita: ' + entry.team1 + ' vs ' + entry.team2 + (entry.competition ? ' - ' + entry.competition : '') + ' del ' + entry.matchDate + '.\nTrova il punteggio esatto finale. Riporta solo i fatti: risultato, marcatori se disponibili, eventuali note importanti sulla partita.'
     }];
-    let iterations = 0;
-    while (iterations < 3) {
-      iterations++;
-      const res = await fetch("/api/proxy", {
-        method: "POST", headers: { "Content-Type": "application/json", "x-api-key": getApiKey() },
-        body: JSON.stringify({ model: getModel(), max_tokens: 1000, tools, messages })
-      });
-      const data = await res.json();
-      if (!res.ok) break;
-      const assistantContent = data.content || [];
-      messages.push({ role: "assistant", content: assistantContent });
-      for (const block of assistantContent) { if (block.type === 'text' && block.text) risultatoWeb += block.text + '\n'; }
-      const toolUse = assistantContent.filter(b => b.type === 'tool_use');
-      if (!toolUse.length) break;
-      messages.push({ role: "user", content: toolUse.map(tu => ({ type: "tool_result", tool_use_id: tu.id, content: `Cerca il risultato di ${entry.team1} vs ${entry.team2} del ${entry.matchDate}` })) });
+    const res = await fetch("/api/proxy", {
+      method: "POST", headers: { "Content-Type": "application/json", "x-api-key": getApiKey() },
+      body: JSON.stringify({ model: getModel(), max_tokens: 1000, tools, messages })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      for (const block of (data.content || [])) { if (block.type === 'text' && block.text) risultatoWeb += block.text + '\n'; }
     }
   } catch(e) { risultatoWeb = ''; }
 
@@ -4724,23 +4689,11 @@ async function callProxy(messages, useWebSearch, maxTokens) {
 
 function sleep(ms) { return new Promise(function(r){ setTimeout(r, ms); }); }
 
-async function runWithWebSearch(prompt, maxIter) {
+async function runWithWebSearch(prompt) {
   var msgs = [{ role:'user', content: prompt }];
-  var finalText = '';
-  var iter = 0;
-  maxIter = maxIter || 3;
-  while (iter < maxIter) {
-    iter++;
-    var d = await callProxy(msgs, true, 1500);
-    var ac = d.content || [];
-    msgs.push({ role:'assistant', content: ac });
-    var texts = ac.filter(function(b){ return b.type==='text'; }).map(function(b){ return b.text; }).join('');
-    if (texts) finalText = texts;
-    var tu = ac.filter(function(b){ return b.type==='tool_use'; });
-    if (!tu.length) break;
-    msgs.push({ role:'user', content: tu.map(function(t){ return { type:'tool_result', tool_use_id:t.id, content:'Risultati trovati per: ' + t.input.query }; }) });
-  }
-  return finalText;
+  var d = await callProxy(msgs, true, 1500);
+  var ac = d.content || [];
+  return ac.filter(function(b){ return b.type==='text'; }).map(function(b){ return b.text; }).join('');
 }
 
 function parseJSON(text) {
@@ -4807,7 +4760,7 @@ async function avviaGiocataConsigliata() {
       + '{"sport":"","team1":"","team2":"","competizione":"","data":"YYYY-MM-DD","pronostico":"","quota_reale":"1.75","confidenza":72,"rischio":"BASSO","motivo":""}'
       + ']}';
 
-    var raw1 = await runWithWebSearch(p1, 3);
+    var raw1 = await runWithWebSearch(p1);
     var picks = parseJSON(raw1).picks || [];
     if (!picks.length) throw new Error('Nessun pick trovato per il periodo selezionato. Prova altri sport o un periodo diverso.');
     setGStep(1,'done'); setGStep(2,'done'); setGStep(3,'done');
