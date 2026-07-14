@@ -43,6 +43,7 @@
 - Una domanda aperta di Fabio ("cosa ne pensi?", "che ne dici?", "come lo vedresti?") è una richiesta di discussione, **non un via libera a implementare**. Proporre l'idea/alternativa a parole e attendere conferma esplicita prima di scrivere codice — anche se la proposta sembra ovviamente buona.
 - Se un bug è puramente visivo (layout rotto, colori sbagliati, elemento che non appare) e il codice sembra corretto, controllare PRIMA CSS/attributi/ordine di caricamento prima di sospettare la logica JS.
 - **Feedback in blocco** — se Fabio deve segnalare più correzioni sullo stesso output (codice, design doc, ecc.), può usare il formato `SEZIONE / PROBLEMA / AZIONE / DETTAGLIO` invece di prosa libera. Claude applica tutti i feedback ricevuti in un unico round, non uno alla volta.
+- Se una task aperta di `pronostick_stato.md` ha uno scopo ambiguo (può essere interpretata come piccola o grande), chiarire lo scopo con una domanda diretta a Fabio prima di trattarla come "una cosa sola" nel limite di complessità per sessione.
 
 ### Comandi speciali
 

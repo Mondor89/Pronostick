@@ -1368,6 +1368,15 @@ body { padding-bottom: 70px; } /* space for tab bar */
     </div>
   </div>
 
+  <!-- Date filter -->
+  <div class="storico-date-filter" style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+    <span style="font-size:0.78rem;color:var(--muted);">📅 Periodo:</span>
+    <input type="date" id="dateFilterFrom" onchange="applyDateFilter()" style="width:auto;padding:8px 10px;font-size:0.82rem;"/>
+    <span style="color:var(--muted);font-size:0.8rem;">→</span>
+    <input type="date" id="dateFilterTo" onchange="applyDateFilter()" style="width:auto;padding:8px 10px;font-size:0.82rem;"/>
+    <button class="btn-backup" onclick="clearDateFilter()">✕ Reset periodo</button>
+  </div>
+
   <div class="storico-list" id="storicoList"></div>
 </div>
 
@@ -1451,6 +1460,7 @@ body { padding-bottom: 70px; } /* space for tab bar */
     <button class="guida-tab" onclick="switchGuida('mercati',this)">📊 I Mercati</button>
     <button class="guida-tab" onclick="switchGuida('leggi',this)">📖 Leggi i risultati</button>
     <button class="guida-tab" onclick="switchGuida('strategia',this)">🎯 Strategia</button>
+    <button class="guida-tab" onclick="switchGuida('funzioni',this)">🧩 Altre Funzioni</button>
     <button class="guida-tab" onclick="switchGuida('faq',this)">❓ FAQ</button>
   </div>
 
@@ -1600,6 +1610,42 @@ body { padding-bottom: 70px; } /* space for tab bar */
     </div>
   </div>
 
+  <!-- ALTRE FUNZIONI -->
+  <div class="guida-content" id="guida-funzioni">
+    <div class="guida-card">
+      <div class="guida-card-title">🎯 Giocata Consigliata</div>
+      <div class="guida-card-text">
+        Non hai una partita specifica in mente? Nella tab 🎯 Giocata imposti un budget e un periodo (oggi, weekend, prossima settimana...): l'AI scansiona da sola le partite su più sport, sceglie le occasioni più sicure/value e costruisce automaticamente la giocata — singola o combinata — più adatta al budget.<br><br>
+        <strong>Sport da analizzare</strong> — scegli quali sport far scansionare all'AI (Calcio, Basket, Tennis, o aggiungine uno personalizzato).
+      </div>
+    </div>
+    <div class="guida-card">
+      <div class="guida-card-title">📅 Calendario Partite</div>
+      <div class="guida-card-text">
+        Nella tab 📅 Calendario cerchi le partite della settimana per sport/lega e le salvi in una lista personale (~$0.03 per ricerca). Da lì puoi analizzarle con un click (⚡) quando vuoi, senza dover reinserire manualmente squadre e data ogni volta.
+      </div>
+    </div>
+    <div class="guida-card">
+      <div class="guida-card-title">🔗 Modalità Combinata</div>
+      <div class="guida-card-text">
+        Nello Storico, il pulsante 🔗 Combinata ti fa selezionare 2-4 pronostici già salvati (anche di sport diversi) per generare un'analisi della giocata combinata nel suo insieme: quota totale, rischio complessivo e probabilità di successo dell'intera schedina.
+      </div>
+    </div>
+    <div class="guida-card">
+      <div class="guida-card-title">📅 Filtro Data nello Storico</div>
+      <div class="guida-card-text">
+        Sopra la lista dello Storico, i due campi 📅 "Da/A" filtrano i pronostici per periodo (es. solo l'ultimo mese). Si combinano con i filtri In Attesa/Vinti/Persi, e i conteggi sulle tab si aggiornano di conseguenza.
+        <span class="highlight">💡 Utile per rivedere solo un torneo o un mese specifico senza scorrere tutto lo storico.</span>
+      </div>
+    </div>
+    <div class="guida-card">
+      <div class="guida-card-title">💾 Backup</div>
+      <div class="guida-card-text">
+        Dal pulsante 💾 Backup (Storico o Menu) puoi esportare tutto lo storico in un file JSON e reimportarlo — utile per un backup manuale o per spostare i dati su un altro dispositivo senza dover usare l'account Google.
+      </div>
+    </div>
+  </div>
+
   <!-- FAQ -->
   <div class="guida-content" id="guida-faq">
     <div class="guida-card">
@@ -1623,7 +1669,7 @@ body { padding-bottom: 70px; } /* space for tab bar */
         </div>
         <div class="faq-item" onclick="toggleFaq(this)">
           <div class="faq-q">Quale modello AI devo usare? <span class="faq-arrow">▼</span></div>
-          <div class="faq-a">Haiku 4.5 è più veloce ed economico. Sonnet 4.5 è più preciso nell'analisi ma costa 3 volte di più. Consiglio: usa Haiku per testare, Sonnet per le partite importanti su cui vuoi realmente scommettere.</div>
+          <div class="faq-a">Haiku 4.5 è il più veloce ed economico, ottimo per fare pratica. Sonnet 4.5 è il modello consigliato di default — buon equilibrio tra precisione e costo. Sonnet 5 e Opus 4.8 sono più potenti e costano di più: usali per le partite importanti su cui vuoi davvero scommettere.</div>
         </div>
         <div class="faq-item" onclick="toggleFaq(this)">
           <div class="faq-q">Come funziona il grafico ROI nelle statistiche? <span class="faq-arrow">▼</span></div>
@@ -2127,6 +2173,8 @@ let attachedFiles = [];
 let currentResult = null;
 let activeStatusId = null;
 let activeFilter = 'attesa';
+let dateFilterFrom = '';
+let dateFilterTo = '';
 let ouSoglia = '2.5';
 let combinataMode = false;
 let combinataSelected = [];
@@ -3867,8 +3915,26 @@ function setFilter(filter) {
   renderHistory();
 }
 
+function applyDateFilter() {
+  dateFilterFrom = document.getElementById('dateFilterFrom').value;
+  dateFilterTo = document.getElementById('dateFilterTo').value;
+  renderHistory();
+}
+
+function clearDateFilter() {
+  dateFilterFrom = '';
+  dateFilterTo = '';
+  document.getElementById('dateFilterFrom').value = '';
+  document.getElementById('dateFilterTo').value = '';
+  renderHistory();
+}
+
 function renderHistory() {
-  const history = loadHistory();
+  const history = loadHistory().filter(function(e) {
+    if (dateFilterFrom && (!e.matchDate || e.matchDate < dateFilterFrom)) return false;
+    if (dateFilterTo && (!e.matchDate || e.matchDate > dateFilterTo)) return false;
+    return true;
+  });
   const listEl = document.getElementById('storicoList');
   const counts = { attesa: 0, vinto: 0, perso: 0 };
   history.forEach(function(e) {
@@ -3887,7 +3953,10 @@ function renderHistory() {
   });
 
   if (!filtered.length) {
-    const emptyMsg = { attesa: '⏳ Nessun pronostico in attesa.', vinto: '🏆 Nessun pronostico vinto ancora.', perso: '📭 Nessun pronostico perso registrato.' }[activeFilter];
+    const periodoAttivo = dateFilterFrom || dateFilterTo;
+    const emptyMsg = periodoAttivo
+      ? '📅 Nessun pronostico nel periodo selezionato.'
+      : { attesa: '⏳ Nessun pronostico in attesa.', vinto: '🏆 Nessun pronostico vinto ancora.', perso: '📭 Nessun pronostico perso registrato.' }[activeFilter];
     listEl.innerHTML = '<div class="storico-empty">' + emptyMsg + '</div>';
     return;
   }

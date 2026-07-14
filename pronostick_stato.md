@@ -9,7 +9,7 @@
 | Campo | Valore |
 |-------|--------|
 | **Ultimo aggiornamento** | 14/07/2026 |
-| **Ultima sessione** | Implementata la logica condizionale per il tool `web_search`: `web_search_20260209` (dynamic filtering) per i modelli che lo supportano, `web_search_20250305` per gli altri |
+| **Ultima sessione** | Aggiunto filtro data nello Storico + aggiornata la sezione Guida (nuova tab "Altre Funzioni" + FAQ modello AI corretta) |
 | **Deploy** | https://pronostick.netlify.app/ |
 | **GitHub** | Mondor89/Pronostick |
 | **Tier Anthropic** | Tier 1 (modello consigliato: Haiku) |
@@ -17,7 +17,7 @@
 ---
 
 ## Focus Attuale
-App funzionante e deployata. Nessun bug noto aperto al momento. Chiusa la task rimandata dalla sessione precedente: upgrade condizionale del tool `web_search` in base al modello selezionato. Prossimo passo: sistema Tag Pattern per AI Memory.
+App funzionante e deployata. Nessun bug noto aperto al momento. Chiuse le due task di priorità alta/media rimaste aperte: filtro data nello Storico e aggiornamento della Guida (Giocata, Calendario, Combinata, Backup, Filtro Data ora documentati). Prossimo passo: sistema Tag Pattern per AI Memory.
 
 ---
 
@@ -36,10 +36,6 @@ App funzionante e deployata. Nessun bug noto aperto al momento. Chiusa la task r
 ### Priorità Alta
 - [ ] Sistema Tag Pattern per AI Memory (con 30+ pronostici verificati)
 - [ ] Upgrade modello a Sonnet quando Tier 2 (≥$40 spesi)
-- [ ] Filtro date nello storico
-
-### Priorità Media
-- [ ] Aggiornare sezione Guida con le nuove feature
 
 ### Priorità Bassa
 - [ ] Da definire nelle prossime sessioni
@@ -76,6 +72,8 @@ App funzionante e deployata. Nessun bug noto aperto al momento. Chiusa la task r
 - [x] Trovato e corretto un terzo bug durante la sessione: `renderCalendario()` non escapava team1/team2/competizione/sport/ora/stadio — corretto e verificato con payload XSS in localStorage (14/07/2026)
 - [x] Controllati i model ID Anthropic nel dropdown Menu ⚙️ (`index.html:1680-1683`) — trovati `claude-sonnet-4-20250514` e `claude-opus-4-20250514` già oltre la data di ritiro Anthropic (15/06/2026), a rischio 404 silenzioso. Sostituiti con `claude-sonnet-5` e `claude-opus-4-8`; mantenuti invariati Haiku 4.5 e Sonnet 4.5. Verificato in anteprima locale: dropdown corretto, selezione salva su `localStorage`, nessun errore console (14/07/2026)
 - [x] Upgrade condizionale del tool `web_search_20250305` → `web_search_20260209` (dynamic filtering) in base al modello selezionato — aggiunta `getWebSearchTool()` (`index.html:2459-2465`) che usa la variante dynamic filtering per `claude-sonnet-5`/`claude-opus-4-8` e la variante base per `claude-haiku-4-5`/`claude-sonnet-4-5` (non supportata). Sostituiti tutti e 4 i punti che costruivano il tool a mano (`fetchWebData`, ricerca calendario, `verificaRisultato`, `callProxy`) con la nuova funzione condivisa. Verificato in anteprima locale con tutti e 4 i modelli del dropdown, nessun errore console (14/07/2026)
+- [x] Filtro data nello Storico — due campi Da/A (`index.html:1372-1379`) che filtrano su `matchDate` (già in formato `YYYY-MM-DD`, nessun nuovo rischio di escaping), combinabili con i filtri di stato esistenti; i conteggi delle tab si aggiornano in base al periodo filtrato. Verificato in anteprima locale con dati simulati (14/07/2026)
+- [x] Aggiornata la Guida — nuova tab "🧩 Altre Funzioni" (`index.html:1613`) che documenta Giocata Consigliata, Calendario, Modalità Combinata, Filtro Data e Backup (mai spiegati prima); corretta la FAQ "Quale modello AI devo usare?" per includere Sonnet 5/Opus 4.8 (14/07/2026)
 
 ---
 
@@ -104,6 +102,8 @@ Nessun bug noto aperto al momento (ultimi 3 chiusi il 14/07/2026 — vedi Log Se
 | 14/07/2026 | Sostituiti solo i 2 model ID deprecati nel dropdown (`sonnet-4`→`sonnet-5`, `opus-4`→`opus-4-8`), lasciando invariati Haiku 4.5 e Sonnet 4.5 | Fabio ha scelto l'opzione a minimo impatto tra tre proposte (fix minimo / minimo impatto / rifacimento completo lista+guida) — priorità a chiudere subito il rischio 404, senza aprire una revisione più ampia in questa sessione |
 | 14/07/2026 | PATCH applicata a `CLAUDE.md` (Note permanenti): aggiunta regola di riverifica periodica dei model ID Anthropic nel dropdown | 2 modelli su 4 nel dropdown erano già oltre la data di ritiro Anthropic senza che nulla lo segnalasse — un modello deprecato fallisce solo alla chiamata reale, silenziosamente |
 | 14/07/2026 | Aggiunta funzione condivisa `getWebSearchTool()` invece di un flag statico o una nuova opzione in `CLAUDE.md`/impostazioni | La scelta della variante `web_search` dipende dal modello già selezionato dall'utente in Menu ⚙️ — nessun nuovo controllo utente necessario, basta derivarla da `getModel()` |
+| 14/07/2026 | Prima di iniziare l'aggiornamento della Guida, chiarito con Fabio lo scopo (aggiornamento leggero vs copertura completa) tramite domanda diretta invece di assumerlo | La task in `pronostick_stato.md` era descritta in modo ambiguo ("aggiornare con le nuove feature") — scelta la copertura completa (documentate anche Giocata, Calendario, Combinata, Backup, mai spiegate prima) |
+| 14/07/2026 | PATCH applicata a `CLAUDE.md` (Come lavoriamo): chiarire lo scopo con Fabio quando una task aperta di `pronostick_stato.md` è ambigua, prima di trattarla come "una cosa sola" | Evitare di sotto/sovra-stimare lo sforzo di una sessione partendo da un'etichetta breve nella lista task |
 
 ---
 
@@ -133,6 +133,7 @@ Nessun bug noto aperto al momento (ultimi 3 chiusi il 14/07/2026 — vedi Log Se
 | 14/07/2026 | Corretti i 2 bug noti aperti: (1) self-XSS in `updateAuthUI()` — `photoURL`/`displayName` ora passati da `escapeHtml()`; (2) `renderCalendario()` — aggiunto pulsante 🗑 elimina singola anche per le partite passate, riusando `rimuoviDalCalendario()` già esistente. Durante il lavoro sul bug (2) trovato un terzo bug non pianificato: team1/team2/competizione/sport/ora/stadio in `renderCalendario()` non passavano da `escapeHtml()` — corretto su richiesta esplicita di Fabio ("correggi ora") invece di limitarsi ad annotarlo in Bug Noti. Tutti e 3 verificati in anteprima locale: script pattern-trappola eseguito (solo il solito falso positivo sul backtick), test manuale con payload XSS reali (`<img onerror>`, `<script>`) iniettati in localStorage — nessuna esecuzione, nessun errore console. Eseguito REGISTRA: Fase 1 PATCH proposta e confermata da Fabio (elenco funzioni escaping in CLAUDE.md/sicurezza.md dichiarato non esaustivo + aggiunto `renderCalendario()`), poi Fase 2 con aggiornamento di tutti i `.md`. |
 | 14/07/2026 | Su richiesta di Fabio, controllati i modelli AI usati da Pronostick contro il catalogo Anthropic corrente. Trovato: dei 4 modelli nel dropdown Menu ⚙️ (`index.html:1680-1683`), `claude-sonnet-4-20250514` e `claude-opus-4-20250514` avevano già superato la data di ritiro Anthropic (15/06/2026) — rischio concreto di errore 404 silenzioso per gli utenti che li selezionavano. Presentate 3 opzioni a Fabio (fix minimo / minimo impatto mantenendo struttura / rifacimento completo); scelta l'opzione a minimo impatto: sostituiti i 2 ID deprecati con `claude-sonnet-5` e `claude-opus-4-8`, lasciati invariati Haiku 4.5 e Sonnet 4.5. Verificato in anteprima locale (dropdown corretto, `saveModel()` salva su `localStorage`, nessun errore console). Controllato anche il resto del codice per altre obsolescenze: nessun controllo hardcoded sul nome modello, header `anthropic-version` corretto, nessuna dipendenza/versione Node obsoleta in `netlify.toml`. Trovato un punto non urgente: il tool `web_search_20250305` (4 occorrenze) è la variante "base", ancora funzionante con tutti i modelli — esiste una variante più recente (`web_search_20260209`, dynamic filtering) ma supportata solo da Sonnet 5/4.6 e Opus 4.6+, non da Haiku 4.5/Sonnet 4.5 tuttora in uso; rimandato a sessione dedicata (vedi Task Aperte) perché richiede logica condizionale per modello, non un semplice swap. Eseguito REGISTRA: Fase 1 PATCH proposta e confermata (aggiunta a `CLAUDE.md` la regola di riverifica periodica dei model ID), poi Fase 2 con aggiornamento di tutti i `.md`. |
 | 14/07/2026 | Sessione dedicata all'upgrade condizionale del tool `web_search`, come annotato nella sessione precedente. Aggiunta `getWebSearchTool()` (`index.html:2459-2465`): usa `web_search_20260209` (dynamic filtering) per `claude-sonnet-5`/`claude-opus-4-8`, `web_search_20250305` per `claude-haiku-4-5`/`claude-sonnet-4-5` (non supportano la variante dynamic filtering). Sostituiti i 4 punti che costruivano il tool manualmente. Verificato in console del browser (anteprima locale) che la funzione restituisce il tool corretto per tutti e 4 i modelli del dropdown; nessun errore console. Non eseguiti REVISIONA/VERIFICA-SICUREZZA formali (nessun nuovo input utente, secret o dato persistito — soglia "salta" del `CLAUDE.md`). Eseguito REGISTRA: Fase 1 senza PATCH (nulla di non banale emerso), Fase 2 con aggiornamento dei `.md`. |
+| 14/07/2026 | Chiuse le 2 task rimaste aperte: (1) filtro data nello Storico — due campi Da/A che filtrano su `matchDate`, combinati con i filtri di stato esistenti; (2) aggiornamento Guida — chiarito con Fabio lo scopo (scelta "copertura completa"), aggiunta nuova tab "🧩 Altre Funzioni" con Giocata Consigliata, Calendario, Combinata, Filtro Data, Backup, e corretta la FAQ modello AI obsoleta. Entrambe verificate in anteprima locale (dati simulati per il filtro, click sulle nuove tab/FAQ per la Guida), nessun errore console. Non eseguiti REVISIONA/VERIFICA-SICUREZZA formali (solo UI, nessun nuovo secret/dato persistito/input non sanificato). Eseguito REGISTRA: Fase 1 PATCH proposta e confermata da Fabio (chiarire lo scopo di task ambigue prima di iniziare), poi Fase 2 con aggiornamento di tutti i `.md`. |
 
 ## Archivio Log
 > Sposta qui le sessioni più vecchie quando il log diventa lungo.
