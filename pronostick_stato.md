@@ -11,7 +11,7 @@
 | **Ultimo aggiornamento** | 14/07/2026 |
 | **Ultima sessione** | Code review completo + fix 5 bug (Claude Code) |
 | **Deploy** | https://pronostick.netlify.app/ |
-| **GitHub** | Mondo89/Pronostick |
+| **GitHub** | Mondor89/Pronostick |
 | **Tier Anthropic** | Tier 1 (modello consigliato: Haiku) |
 
 ---
@@ -41,7 +41,6 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 
 ### Priorità Media
 - [ ] Aggiornare sezione Guida con le nuove feature
-- [ ] Collegare la cartella locale del progetto al repo GitHub (attualmente non è un git repo locale, quindi le modifiche fatte in locale non sono tracciate/pushate automaticamente)
 
 ### Priorità Bassa
 - [ ] Da definire nelle prossime sessioni
@@ -62,6 +61,7 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 - [x] Tab Giocata, Calendario, Storico, Guida, Menu funzionanti
 - [x] Deploy su Netlify funzionante
 - [x] Code review completo di index.html (14/07/2026) — 5 bug reali trovati e corretti (vedi Log Sessioni)
+- [x] Cartella locale collegata al repo GitHub Mondor89/Pronostick (14/07/2026) — ora Claude Code può committare e pushare direttamente
 
 ---
 
