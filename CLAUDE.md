@@ -49,10 +49,13 @@
 **RIEPILOGO** — Leggi `pronostick_stato.md` e `pronostick_sicurezza.md` e produci un riepilogo in 5-6 righe:
 stato attuale, ultima decisione presa, task di questa sessione. Poi attendi.
 
-**REGISTRA** — Leggi tutti i file `.md` e aggiornali con quanto emerso nella sessione.
-Indica cosa è cambiato in ogni file. Poi fai `git add . && git commit` (chiedi conferma prima del push, salvo diversa indicazione di Fabio).
+**REGISTRA** — In due fasi, in quest'ordine:
 
-**Checklist obbligatoria REGISTRA — rispondere sì/no a ogni voce, aggiornare se sì:**
+**Fase 1 — analisi PATCH.** Prima di toccare qualunque file, esegui l'analisi del comando PATCH (vedi sotto) sull'intera sessione. Se emerge almeno una `⚠️ PATCH SUGGERITA`, presentala e attendi la decisione di Fabio (applicare, modificare, scartare) prima di continuare. Se non emerge nulla di non banale, dillo esplicitamente in una riga e passa subito alla Fase 2 senza bloccare la sessione per una formalità.
+
+**Fase 2 — REGISTRA vero e proprio.** Solo dopo la decisione della Fase 1 (ed eventuali modifiche a `CLAUDE.md` già applicate): leggi tutti i file `.md` e aggiornali con quanto emerso nella sessione, inclusa la decisione appena presa sulla PATCH. Indica cosa è cambiato in ogni file. Poi fai `git add . && git commit` in un unico commit che comprenda anche l'eventuale modifica a `CLAUDE.md` (chiedi conferma prima del push, salvo diversa indicazione di Fabio).
+
+**Checklist obbligatoria REGISTRA (Fase 2) — rispondere sì/no a ogni voce, aggiornare se sì:**
 
 | File | Domanda trigger |
 |------|----------------|
@@ -82,7 +85,7 @@ PROBLEMA: [cosa mancava o era inefficiente]
 MODIFICA: [testo esatto da aggiungere/sostituire]
 PRIORITÀ: [alta / media / bassa]
 ```
-Poi attendi conferma di Fabio prima di modificare `CLAUDE.md`. Se Fabio annuncia la chiusura della sessione e non ha eseguito PATCH, proponilo autonomamente prima di concludere — **solo se** nella sessione sono emersi pattern non banali o gap ripetuti, non per un singolo bugfix minore.
+Poi attendi conferma di Fabio prima di modificare `CLAUDE.md`. Questa analisi è la Fase 1 del comando REGISTRA (vedi sopra) e va sempre eseguita in quel contesto. Se Fabio annuncia la chiusura della sessione senza aver chiamato REGISTRA né PATCH, proponi comunque una PATCH autonomamente prima di concludere — **solo se** nella sessione sono emersi pattern non banali o gap ripetuti, non per un singolo bugfix minore.
 
 ---
 
@@ -240,6 +243,7 @@ Se `index.html` dovesse superare le ~6000 righe o servissero più pagine distint
 ## Checklist pre-commit [UNIVERSALE]
 
 - [ ] Eseguito `scripts/check-known-bug-patterns.sh index.html` (controllo euristico dei pattern-trappola documentati sotto — falsi positivi possibili, verificare a mano)
+- [ ] Se la modifica è testabile senza login (Firebase Auth richiede comunque un account reale), verificata in anteprima locale (`.claude/launch.json`, `localhost:8080`) prima del push
 - [ ] Nessun errore in console del browser
 - [ ] Testato manualmente il flusso principale
 - [ ] Nessun `console.log`/debug dimenticato
