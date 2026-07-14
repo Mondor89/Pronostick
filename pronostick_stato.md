@@ -9,7 +9,7 @@
 | Campo | Valore |
 |-------|--------|
 | **Ultimo aggiornamento** | 14/07/2026 |
-| **Ultima sessione** | Code review completo + fix 5 bug (Claude Code) |
+| **Ultima sessione** | Applicato template CLAUDE.md (Claude Code) |
 | **Deploy** | https://pronostick.netlify.app/ |
 | **GitHub** | Mondor89/Pronostick |
 | **Tier Anthropic** | Tier 1 (modello consigliato: Haiku) |
@@ -37,7 +37,7 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 - [ ] Sistema Tag Pattern per AI Memory (con 30+ pronostici verificati)
 - [ ] Upgrade modello a Sonnet quando Tier 2 (≥$40 spesi)
 - [ ] Filtro date nello storico
-- [ ] Verificare regole di sicurezza Firestore (users/{uid}/... deve richiedere request.auth.uid == uid) — non verificabile da codice, va controllato in console Firebase
+- [ ] Verificare regole di sicurezza Firestore — dettagli e checklist in `pronostick_sicurezza.md` (invariante #5, non verificabile da codice, va controllato in console Firebase)
 
 ### Priorità Media
 - [ ] Aggiornare sezione Guida con le nuove feature
@@ -62,6 +62,7 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 - [x] Deploy su Netlify funzionante
 - [x] Code review completo di index.html (14/07/2026) — 5 bug reali trovati e corretti (vedi Log Sessioni)
 - [x] Cartella locale collegata al repo GitHub Mondor89/Pronostick (14/07/2026) — ora Claude Code può committare e pushare direttamente
+- [x] Applicato `CLAUDE_APP_TEMPLATE.md` al progetto (14/07/2026) — creati `CLAUDE.md` e `pronostick_sicurezza.md` (vedi Decisioni Prese)
 
 ---
 
@@ -82,6 +83,7 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 | 25/04/2026 | Firebase Firestore per sync | Gratuito nel piano attuale |
 | 25/04/2026 | Haiku come modello AI su Tier 1 | Rate limit più alto di Sonnet su Tier 1 |
 | 25/04/2026 | Singolo file HTML inline | Semplicità di deploy su Netlify |
+| 14/07/2026 | Adottato `CLAUDE.md` (Claude Code) basato su `CLAUDE_APP_TEMPLATE.md` + nuovo file `pronostick_sicurezza.md` | Standardizzare il workflow con gli altri progetti (giochi) e formalizzare le invarianti di sicurezza emerse dal code review |
 
 ---
 
@@ -102,6 +104,7 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 |------|----------|
 | 25/04/2026 | Implementazione Cerca Quote, dropdown bookmaker, pannello quote collassabile, pulsante TUTTI i mercati |
 | 14/07/2026 | Code review di index.html con Claude Code. Trovati e corretti 5 bug: (1) `buildMemory()` — precedenza operatori errata nel ternario, il testo "lezioni apprese" mandato all'AI era troncato; (2) stesso bug con `||` sui campi "Indovinato/Sbagliato"; (3) `fetchWebData()` — tool_result della ricerca web malformato per lo stesso motivo; (4) `verificaRisultato()` — usava apici singoli invece di backtick, `${entry.team1}` veniva inviato all'AI come testo letterale invece che interpolato; (5) `team1`/`team2`/`competition`/`sport`/`matchDate` non passati da `escapeHtml()` in `renderResult()` e `buildFullDetailHTML()` (rischio XSS basso, self-XSS). Segnalate ma non verificabili da qui: regole sicurezza Firestore, cartella locale non collegata al repo git. |
+| 14/07/2026 | Creato `CLAUDE_APP_TEMPLATE.md` (in cartella Skill Claude, base per futuri progetti app) e applicato a Pronostick: nuovo `CLAUDE.md` con identità progetto, principi prodotto, comandi RIEPILOGO/REGISTRA/REVISIONA/VERIFICA-SICUREZZA; nuovo `pronostick_sicurezza.md` con le invarianti di sicurezza (incluso l'item ancora aperto sulle regole Firestore). |
 
 ## Archivio Log
 > Sposta qui le sessioni più vecchie quando il log diventa lungo.

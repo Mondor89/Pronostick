@@ -1,0 +1,45 @@
+# Regole di Sicurezza — Pronostick
+*Documento operativo. Ogni nuova funzionalità che tocca dati/secret va verificata qui PRIMA dell'implementazione.*
+
+## Invarianti di Sicurezza — Non violare mai
+
+| # | Invariante | Perché è sacra |
+|---|-----------|----------------|
+| 1 | Nessun secret Anthropic hardcoded nel codice frontend | Il codice client (`index.html`) è sempre leggibile da chiunque |
+| 2 | L'API key Anthropic è pattern BYOK: l'utente la inserisce, salvata solo in `localStorage`, mai inviata altrove che al proprio proxy | Evita costi/abusi sull'account di terzi |
+| 3 | `netlify/functions/proxy.js` inoltra la richiesta ad Anthropic senza mai loggare o persistere la key ricevuta | Il proxy è l'unico punto server-side — se logga la key, diventa un punto di furto |
+| 4 | Ogni input utente (team1, team2, competition, sport, matchDate, ecc.) che finisce in `innerHTML` passa da `escapeHtml()` | Previene XSS, anche self-XSS, in `renderResult()`, `buildFullDetailHTML()`, `buildCompactCardDOM()` |
+| 5 | I dati Firestore (`users/{uid}/data/history`, `users/{uid}/data/calendario`) devono essere isolati per utente lato regole di sicurezza | Evita che un utente autenticato legga/scriva i dati di un altro |
+| 6 | La `apiKey` Firebase visibile nel client (`firebaseConfig`) NON è un secret — è un identificatore pubblico del progetto, protetto dalle Firestore Rules, non dalla segretezza | Evita falsi allarmi in audit futuri: non va trattata come l'API key Anthropic |
+
+## Stato di verifica
+
+| # | Invariante | Stato | Note |
+|---|-----------|-------|------|
+| 1-4 | Vedi sopra | ✅ Verificate (code review 14/07/2026) | Bug di escaping mancante (#4) corretti lo stesso giorno |
+| 5 | Isolamento dati Firestore per utente | ⚠️ **Non verificato** | Va controllato in console Firebase → Firestore → Rules che sia presente `request.auth.uid == uid`. Non verificabile leggendo solo il codice client. |
+| 6 | — | ✅ Nota informativa, nessuna azione richiesta | — |
+
+## Superficie di Attacco per Funzionalità
+
+| Funzionalità | Tocca secret? | Tocca dati utente? | Input esterno non fidato? | Note |
+|---|---|---|---|---|
+| Analisi pronostico (`analyzeMatch`) | Sì (API key via header) | No | Sì (risposta AI, eventuale web search) | Team/competition/context inseriti dall'utente, ora sanificati |
+| Cerca Quote Bookmaker | Sì (API key) | No | Sì (risultato ricerca web) | — |
+| Login Google / sync Firebase | No | Sì (storico, calendario) | No | Isolamento dipende dalle Firestore Rules (vedi #5 sopra) |
+| Import/Export backup JSON | No | Sì (dati locali) | Sì (file caricato dall'utente) | `processImport()` — verificare che il parsing non esegua codice, solo `JSON.parse` |
+
+## Checklist VERIFICA-SICUREZZA
+
+- [ ] Viola un'invariante di sicurezza della tabella sopra?
+- [ ] Nuovo secret/API key — gestito come Anthropic (BYOK + proxy senza log)?
+- [ ] Nuovo punto di input utente — passato da `escapeHtml()` prima di finire nel DOM?
+- [ ] Nuovo dato persistito su Firestore — isolato per utente (`users/{uid}/...`)?
+- [ ] Nuova chiamata a API esterna — gestita se fallisce/va in timeout?
+
+## Registro Decisioni di Sicurezza
+
+| Data | Decisione | Motivazione |
+|------|-----------|--------------|
+| 14/07/2026 | File creato, invarianti 1-6 documentate a partire dal code review dello stesso giorno | Formalizzare quanto emerso dalla review di `index.html` |
+| 14/07/2026 | Escaping mancante corretto in `renderResult()` e `buildFullDetailHTML()` per team1/team2/competition/sport/matchDate | Rischio XSS (self-XSS) — vedi `pronostick_stato.md` log sessioni |
