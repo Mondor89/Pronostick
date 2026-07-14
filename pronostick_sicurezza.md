@@ -17,7 +17,7 @@
 | # | Invariante | Stato | Note |
 |---|-----------|-------|------|
 | 1-4 | Vedi sopra | ✅ Verificate (code review 14/07/2026) | Bug di escaping mancante (#4) corretti lo stesso giorno |
-| 5 | Isolamento dati Firestore per utente | ⚠️ **Non verificato** | Va controllato in console Firebase → Firestore → Rules che sia presente `request.auth.uid == uid`. Non verificabile leggendo solo il codice client. |
+| 5 | Isolamento dati Firestore per utente | ✅ **Corrette e pubblicate (14/07/2026)** | Erano le regole di default "modalità test" di Firebase, scadute il 17/05/2026, senza `request.auth` (violazione storica, vedi Registro Decisioni). Fabio ha pubblicato le regole di `firestore.rules` in Firebase Console lo stesso giorno. Verifica funzionale (login + salvataggio storico/calendario) ancora da fare — vedi `pronostick_stato.md`. |
 | 6 | — | ✅ Nota informativa, nessuna azione richiesta | — |
 
 ## Superficie di Attacco per Funzionalità
@@ -43,3 +43,4 @@
 |------|-----------|--------------|
 | 14/07/2026 | File creato, invarianti 1-6 documentate a partire dal code review dello stesso giorno | Formalizzare quanto emerso dalla review di `index.html` |
 | 14/07/2026 | Escaping mancante corretto in `renderResult()` e `buildFullDetailHTML()` per team1/team2/competition/sport/matchDate | Rischio XSS (self-XSS) — vedi `pronostick_stato.md` log sessioni |
+| 14/07/2026 | Trovate regole Firestore di default (test mode, scadute il 17/05/2026, nessun `request.auth`) — invariante #5 era violata, non solo "da verificare". Scritte regole corrette in `firestore.rules`, in attesa che Fabio le pubblichi in console | Fabio ha incollato le regole attuali su richiesta di Claude Code per chiudere la verifica dell'invariante #5 |

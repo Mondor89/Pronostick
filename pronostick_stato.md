@@ -34,10 +34,11 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 ## Task Aperte
 
 ### Priorità Alta
+- [ ] Verificare funzionalmente il sync dopo la pubblicazione delle nuove regole Firestore (14/07/2026) — login Google + salvataggio/lettura storico e calendario, controllare assenza errori in console
 - [ ] Sistema Tag Pattern per AI Memory (con 30+ pronostici verificati)
 - [ ] Upgrade modello a Sonnet quando Tier 2 (≥$40 spesi)
 - [ ] Filtro date nello storico
-- [ ] Verificare regole di sicurezza Firestore — dettagli e checklist in `pronostick_sicurezza.md` (invariante #5, non verificabile da codice, va controllato in console Firebase)
+- [ ] Correggere self-XSS in `updateAuthUI()` (vedi Bug Noti #1)
 
 ### Priorità Media
 - [ ] Aggiornare sezione Guida con le nuove feature
@@ -67,6 +68,8 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 - [x] Verificata struttura file progetto con Claude Code — coerente con `CLAUDE.md`, nessun file orfano (14/07/2026)
 - [x] Aggiunto `.gitignore` (14/07/2026)
 - [x] Creato `scripts/check-known-bug-patterns.sh` — controllo euristico dei pattern-trappola (precedenza operatori, apici vs backtick, escaping mancante), richiamato nella checklist pre-commit di `CLAUDE.md` (14/07/2026)
+- [x] Regole Firestore corrette scritte in `firestore.rules` e pubblicate da Fabio in console (14/07/2026) — chiude invariante #5
+- [x] Corretto `logoutGoogle()` (index.html:1996) — non svuotava `localStorage` (storico/calendario) al logout, dati restavano visibili come se l'utente fosse ancora loggato (14/07/2026)
 
 ---
 
@@ -75,6 +78,7 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 | # | Descrizione | Stato |
 |---|-------------|-------|
 | 1 | `updateAuthUI()` (index.html:2097-2098) — `user.photoURL`/`user.displayName` (nome account Google) inseriti in `innerHTML` senza `escapeHtml()`. Rischio self-XSS basso, stessa categoria dei bug corretti il 14/07 su team1/team2 — trovato dal nuovo script `scripts/check-known-bug-patterns.sh` | Aperto — non corretto in questa sessione (fuori scope, da riprendere in una sessione dedicata) |
+| 2 | `renderCalendario()` (index.html:3467) — le partite passate mostrano solo l'etichetta "Passata", senza pulsante di eliminazione singola. L'unico modo per rimuoverle è "Svuota tutto il calendario", che cancella anche le partite future | Aperto — trovato durante il test del sync Firestore del 14/07/2026, da affrontare in una sessione dedicata |
 
 ---
 
@@ -111,7 +115,10 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 | 25/04/2026 | Implementazione Cerca Quote, dropdown bookmaker, pannello quote collassabile, pulsante TUTTI i mercati |
 | 14/07/2026 | Code review di index.html con Claude Code. Trovati e corretti 5 bug: (1) `buildMemory()` — precedenza operatori errata nel ternario, il testo "lezioni apprese" mandato all'AI era troncato; (2) stesso bug con `||` sui campi "Indovinato/Sbagliato"; (3) `fetchWebData()` — tool_result della ricerca web malformato per lo stesso motivo; (4) `verificaRisultato()` — usava apici singoli invece di backtick, `${entry.team1}` veniva inviato all'AI come testo letterale invece che interpolato; (5) `team1`/`team2`/`competition`/`sport`/`matchDate` non passati da `escapeHtml()` in `renderResult()` e `buildFullDetailHTML()` (rischio XSS basso, self-XSS). Segnalate ma non verificabili da qui: regole sicurezza Firestore, cartella locale non collegata al repo git. |
 | 14/07/2026 | Creato `CLAUDE_APP_TEMPLATE.md` (in cartella Skill Claude, base per futuri progetti app) e applicato a Pronostick: nuovo `CLAUDE.md` con identità progetto, principi prodotto, comandi RIEPILOGO/REGISTRA/REVISIONA/VERIFICA-SICUREZZA; nuovo `pronostick_sicurezza.md` con le invarianti di sicurezza (incluso l'item ancora aperto sulle regole Firestore). |
-| 14/07/2026 | Discusso con Fabio cosa cambiare avendo Claude Code invece della chat normale. Fatto: (1) verificata struttura file progetto (già coerente con `CLAUDE.md`, nessuna riorganizzazione necessaria), (2) aggiunto `.gitignore`, (3) creato `scripts/check-known-bug-patterns.sh` per intercettare in anticipo i pattern-trappola già noti — lo script ha trovato un nuovo bug reale (self-XSS in `updateAuthUI()`, vedi Bug Noti). Non fatto: lettura automatica delle regole Firestore via Firebase CLI — richiede credenziali che Claude Code non può ricevere; deciso un flusso alternativo senza credenziali (vedi Decisioni Prese). In attesa che Fabio incolli le regole Firestore attuali per chiudere l'invariante #5. |
+| 14/07/2026 | Discusso con Fabio cosa cambiare avendo Claude Code invece della chat normale. Fatto: (1) verificata struttura file progetto (già coerente con `CLAUDE.md`, nessuna riorganizzazione necessaria), (2) aggiunto `.gitignore`, (3) creato `scripts/check-known-bug-patterns.sh` per intercettare in anticipo i pattern-trappola già noti — lo script ha trovato un nuovo bug reale (self-XSS in `updateAuthUI()`, vedi Bug Noti). Non fatto: lettura automatica delle regole Firestore via Firebase CLI — richiede credenziali che Claude Code non può ricevere; deciso un flusso alternativo senza credenziali (vedi Decisioni Prese). |
+| 14/07/2026 | Fabio ha incollato le regole Firestore attuali: erano quelle di default "modalità test" di Firebase, scadute il 17/05/2026, senza alcun controllo `request.auth` — invariante #5 era **violata** (dati di tutti gli utenti leggibili/scrivibili da chiunque fino al 17/05, poi sync bloccato in silenzio per tutti). Scritte regole corrette in `firestore.rules` (isolamento per `request.auth.uid == uid` sui percorsi reali `users/{uid}/data/history` e `users/{uid}/data/calendario`, verificati nel codice). Claude Code non può pubblicarle (modificare le regole di accesso Firebase è un'azione vietata per policy) — **azione richiesta a Fabio**: incollarle in Firebase Console → Firestore Database → Rules → Publish. |
+| 14/07/2026 | Fabio ha pubblicato le nuove regole Firestore in console. Invariante #5 chiusa lato regole — resta da fare la verifica funzionale (login + sync storico/calendario reale), aggiunta come task priorità alta. |
+| 14/07/2026 | Fabio ha testato manualmente il sync dopo le nuove regole: il salvataggio storico funziona. Trovati 2 bug durante il test: (1) `logoutGoogle()` non svuotava `localStorage`, storico/calendario restavano visibili dopo il logout — **corretto** in questa sessione; (2) partite passate nel calendario non hanno pulsante di eliminazione singola, solo etichetta "Passata" — annotato in Bug Noti, da affrontare in sessione dedicata. Fix del bug (1) non testabile in locale (niente Node/Python installati per un server statico) — verifica rimandata a dopo il deploy Netlify. |
 
 ## Archivio Log
 > Sposta qui le sessioni più vecchie quando il log diventa lungo.

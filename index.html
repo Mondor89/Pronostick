@@ -1998,6 +1998,10 @@ window.logoutGoogle = async function() {
     await signOut(auth);
     currentUser = null;
     updateAuthUI(null);
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(CAL_KEY);
+    renderHistory();
+    renderCalendario();
   }
 };
 
