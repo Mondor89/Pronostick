@@ -269,7 +269,8 @@ Messaggio commit: `Sessione N — [funzionalità] / [cosa fatto] / [cosa resta]`
 - `${variabile}` funziona SOLO dentro backtick. Dentro apici singoli/doppi è testo letterale, non viene mai sostituito.
 
 ### Escaping HTML — mai fidarsi dell'input, nemmeno il proprio [PERMANENTE]
-- Qualsiasi valore da un campo utente che finisce in `innerHTML` va passato da `escapeHtml()` — applicato in modo coerente in TUTTI i punti dove quel dato viene renderizzato (in `index.html`: `renderResult()`, `buildFullDetailHTML()`, `buildCompactCardDOM()`).
+- Qualsiasi valore da un campo utente che finisce in `innerHTML` va passato da `escapeHtml()` — applicato in modo coerente in TUTTI i punti dove quel dato viene renderizzato (in `index.html`: `renderResult()`, `buildFullDetailHTML()`, `buildCompactCardDOM()`, `renderCalendario()`).
+- **L'elenco è indicativo, non esaustivo** — ogni nuova funzione che inserisce dati esterni/utente in `innerHTML` va aggiunta qui e verificata con `escapeHtml()`. Trovata il 14/07/2026 una violazione in `renderCalendario()` non coperta da questo elenco: non fidarsi solo della lista, controllare ogni funzione che scrive `innerHTML`.
 
 ### localStorage — chiave stabile [PERMANENTE]
 - `pronostick_apikey`, `pronostick_v3_history`, `pronostick_model` sono le chiavi correnti — non cambiarle senza gestire esplicitamente la migrazione dei dati esistenti (vedi `loadHistory()` per il pattern di migrazione già usato).

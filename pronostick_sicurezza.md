@@ -8,7 +8,7 @@
 | 1 | Nessun secret Anthropic hardcoded nel codice frontend | Il codice client (`index.html`) è sempre leggibile da chiunque |
 | 2 | L'API key Anthropic è pattern BYOK: l'utente la inserisce, salvata solo in `localStorage`, mai inviata altrove che al proprio proxy | Evita costi/abusi sull'account di terzi |
 | 3 | `netlify/functions/proxy.js` inoltra la richiesta ad Anthropic senza mai loggare o persistere la key ricevuta | Il proxy è l'unico punto server-side — se logga la key, diventa un punto di furto |
-| 4 | Ogni input utente (team1, team2, competition, sport, matchDate, ecc.) che finisce in `innerHTML` passa da `escapeHtml()` | Previene XSS, anche self-XSS, in `renderResult()`, `buildFullDetailHTML()`, `buildCompactCardDOM()` |
+| 4 | Ogni input utente (team1, team2, competition, sport, matchDate, ecc.) che finisce in `innerHTML` passa da `escapeHtml()` | Previene XSS, anche self-XSS, in `renderResult()`, `buildFullDetailHTML()`, `buildCompactCardDOM()`, `renderCalendario()`. Elenco indicativo non esaustivo — ogni nuova funzione che scrive `innerHTML` con dati esterni va verificata |
 | 5 | I dati Firestore (`users/{uid}/data/history`, `users/{uid}/data/calendario`) devono essere isolati per utente lato regole di sicurezza | Evita che un utente autenticato legga/scriva i dati di un altro |
 | 6 | La `apiKey` Firebase visibile nel client (`firebaseConfig`) NON è un secret — è un identificatore pubblico del progetto, protetto dalle Firestore Rules, non dalla segretezza | Evita falsi allarmi in audit futuri: non va trattata come l'API key Anthropic |
 
@@ -17,7 +17,7 @@
 | # | Invariante | Stato | Note |
 |---|-----------|-------|------|
 | 1-3 | Vedi sopra | ✅ Verificate (code review 14/07/2026) | — |
-| 4 | Escaping input utente prima di `innerHTML` | ⚠️ **Eccezione nota aperta** | Bug originali (team1/team2/competition/sport/matchDate) corretti il 14/07/2026. Trovata nuova violazione in `updateAuthUI()` (index.html:2097-2098, `user.photoURL`/`displayName` non passati da `escapeHtml()`) — vedi Bug Noti #1 in `pronostick_stato.md`, non ancora corretta |
+| 4 | Escaping input utente prima di `innerHTML` | ✅ **Verificata e corretta (14/07/2026)** | Bug originali (team1/team2/competition/sport/matchDate) corretti il 14/07/2026. Corrette in questa sessione: `updateAuthUI()` (index.html:2101-2102, `photoURL`/`displayName`) e `renderCalendario()` (index.html:3468-3469, team1/team2/competizione/sport/ora/stadio) — verificate manualmente iniettando payload XSS in localStorage, nessuna esecuzione. Elenco funzioni non esaustivo — vedi nota nell'invariante sopra |
 | 5 | Isolamento dati Firestore per utente | ✅ **Corrette, pubblicate e verificate funzionalmente (14/07/2026)** | Erano le regole di default "modalità test" di Firebase, scadute il 17/05/2026, senza `request.auth` (violazione storica, vedi Registro Decisioni). Fabio ha pubblicato le regole di `firestore.rules` in Firebase Console e testato il salvataggio storico, funzionante. |
 | 6 | — | ✅ Nota informativa, nessuna azione richiesta | — |
 
@@ -45,3 +45,4 @@
 | 14/07/2026 | File creato, invarianti 1-6 documentate a partire dal code review dello stesso giorno | Formalizzare quanto emerso dalla review di `index.html` |
 | 14/07/2026 | Escaping mancante corretto in `renderResult()` e `buildFullDetailHTML()` per team1/team2/competition/sport/matchDate | Rischio XSS (self-XSS) — vedi `pronostick_stato.md` log sessioni |
 | 14/07/2026 | Trovate regole Firestore di default (test mode, scadute il 17/05/2026, nessun `request.auth`) — invariante #5 era violata, non solo "da verificare". Scritte regole corrette in `firestore.rules`, in attesa che Fabio le pubblichi in console | Fabio ha incollato le regole attuali su richiesta di Claude Code per chiudere la verifica dell'invariante #5 |
+| 14/07/2026 | Corretto self-XSS in `updateAuthUI()` (photoURL/displayName) e trovato+corretto nella stessa sessione un secondo punto non coperto dall'elenco: `renderCalendario()` (team1/team2/competizione/sport/ora/stadio). Elenco funzioni dell'invariante #4 dichiarato non esaustivo | L'elenco fisso di nomi-funzione in CLAUDE.md/sicurezza.md aveva lasciato fuori una funzione di rendering reale — PATCH applicata per prevenire la stessa lacuna in futuro |

@@ -2098,8 +2098,8 @@ function updateAuthUI(user) {
   if (user) {
     actions.innerHTML = `
       <div class="auth-user">
-        <img class="auth-avatar" src="${user.photoURL || ''}" onerror="this.style.display='none'"/>
-        <span class="auth-name">${user.displayName || user.email}</span>
+        <img class="auth-avatar" src="${escapeHtml(user.photoURL || '')}" onerror="this.style.display='none'"/>
+        <span class="auth-name">${escapeHtml(user.displayName || user.email || '')}</span>
         <button class="btn-logout" onclick="logoutGoogle()">Esci</button>
       </div>`;
     desc.textContent = 'Storico sincronizzato automaticamente su tutti i dispositivi.';
@@ -3465,10 +3465,13 @@ function renderCalendario() {
       return '<div style="background:var(--surface);border:1px solid ' + (isPastMatch ? 'var(--border)' : 'rgba(77,166,255,0.2)') + ';border-radius:10px;padding:14px 16px;margin-bottom:8px;opacity:' + (isPastMatch ? '0.55' : '1') + ';">'
         + '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">'
         + '<div style="flex:1;">'
-        + '<div style="font-size:0.65rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">' + (p.competizione||p.sport||'') + (p.ora ? ' · ' + p.ora : '') + (p.stadio ? ' · ' + p.stadio : '') + '</div>'
-        + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:1.1rem;letter-spacing:1px;color:var(--text);">' + p.team1 + ' <span style="color:var(--muted);font-size:0.8rem;">vs</span> ' + p.team2 + '</div>'
+        + '<div style="font-size:0.65rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">' + escapeHtml(p.competizione||p.sport||'') + (p.ora ? ' · ' + escapeHtml(p.ora) : '') + (p.stadio ? ' · ' + escapeHtml(p.stadio) : '') + '</div>'
+        + '<div style="font-family:\'Bebas Neue\',sans-serif;font-size:1.1rem;letter-spacing:1px;color:var(--text);">' + escapeHtml(p.team1) + ' <span style="color:var(--muted);font-size:0.8rem;">vs</span> ' + escapeHtml(p.team2) + '</div>'
         + '</div>'
-        + (isPastMatch ? '<span style="font-size:0.7rem;color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:3px 8px;">Passata</span>'
+        + (isPastMatch ? '<div style="display:flex;align-items:center;gap:8px;">'
+          + '<span style="font-size:0.7rem;color:var(--muted);border:1px solid var(--border);border-radius:4px;padding:3px 8px;">Passata</span>'
+          + '<button onclick="rimuoviDalCalendario(\'' + p.id + '\')" style="background:rgba(255,71,87,0.08);color:var(--danger);border:1px solid rgba(255,71,87,0.2);border-radius:7px;padding:8px 10px;font-size:0.8rem;cursor:pointer;">🗑</button>'
+          + '</div>'
           : '<div style="display:flex;gap:8px;">'
           + '<button onclick="analizzaDalCalendario(\'' + p.id + '\')" style="background:var(--accent);color:var(--bg);border:none;border-radius:7px;padding:8px 14px;font-family:\'Bebas Neue\',sans-serif;font-size:0.82rem;letter-spacing:1px;cursor:pointer;">⚡ ANALIZZA</button>'
           + '<button onclick="rimuoviDalCalendario(\'' + p.id + '\')" style="background:rgba(255,71,87,0.08);color:var(--danger);border:1px solid rgba(255,71,87,0.2);border-radius:7px;padding:8px 10px;font-size:0.8rem;cursor:pointer;">🗑</button>'
