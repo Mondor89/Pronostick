@@ -63,6 +63,7 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 - [x] Code review completo di index.html (14/07/2026) — 5 bug reali trovati e corretti (vedi Log Sessioni)
 - [x] Cartella locale collegata al repo GitHub Mondor89/Pronostick (14/07/2026) — ora Claude Code può committare e pushare direttamente
 - [x] Applicato `CLAUDE_APP_TEMPLATE.md` al progetto (14/07/2026) — creati `CLAUDE.md` e `pronostick_sicurezza.md` (vedi Decisioni Prese)
+- [x] Aggiunti comandi PATCH e auto-audit a `CLAUDE.md` (14/07/2026) — sincronizzati anche nei template GAME/ROBLOX/APP
 
 ---
 
@@ -84,6 +85,7 @@ App funzionante e deployata, appena passata da un code review approfondito con b
 | 25/04/2026 | Haiku come modello AI su Tier 1 | Rate limit più alto di Sonnet su Tier 1 |
 | 25/04/2026 | Singolo file HTML inline | Semplicità di deploy su Netlify |
 | 14/07/2026 | Adottato `CLAUDE.md` (Claude Code) basato su `CLAUDE_APP_TEMPLATE.md` + nuovo file `pronostick_sicurezza.md` | Standardizzare il workflow con gli altri progetti (giochi) e formalizzare le invarianti di sicurezza emerse dal code review |
+| 14/07/2026 | Aggiunti comandi PATCH e auto-audit a `CLAUDE.md`, ispirati alle regole `claude_doc_rules.md` di un altro progetto Claude | Colmare un gap: prima non esisteva un modo esplicito per far emergere/correggere regole del CLAUDE.md stesso durante o a fine sessione |
 
 ---
 

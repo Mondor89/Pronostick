@@ -42,6 +42,7 @@
 - Risposte **concise e strutturate**, in italiano
 - Una domanda aperta di Fabio ("cosa ne pensi?", "che ne dici?", "come lo vedresti?") è una richiesta di discussione, **non un via libera a implementare**. Proporre l'idea/alternativa a parole e attendere conferma esplicita prima di scrivere codice — anche se la proposta sembra ovviamente buona.
 - Se un bug è puramente visivo (layout rotto, colori sbagliati, elemento che non appare) e il codice sembra corretto, controllare PRIMA CSS/attributi/ordine di caricamento prima di sospettare la logica JS.
+- **Feedback in blocco** — se Fabio deve segnalare più correzioni sullo stesso output (codice, design doc, ecc.), può usare il formato `SEZIONE / PROBLEMA / AZIONE / DETTAGLIO` invece di prosa libera. Claude applica tutti i feedback ricevuti in un unico round, non uno alla volta.
 
 ### Comandi speciali
 
@@ -72,6 +73,25 @@ Poi attendi conferma prima di procedere con il codice.
 > **Soglia di attivazione:**
 > ✅ USARE per: nuova funzionalità, nuovo punto di input utente, nuova integrazione con API esterna, nuovo dato persistito
 > ⏭ SALTARE per: bugfix UI puro, refactor senza impatto su dati/secret, tweak di stile
+
+**PATCH** — Rivedi l'intera sessione cercando: situazioni non coperte dalle regole attuali di questo `CLAUDE.md`, approcci più efficienti di quelli scritti, errori ricorrenti che una regola avrebbe evitato, regole applicate ma rivelatesi inadeguate. Per ogni gap trovato, produci un blocco:
+```
+⚠️ PATCH SUGGERITA
+SEZIONE:  [sezione di CLAUDE.md / "nuova sezione"]
+PROBLEMA: [cosa mancava o era inefficiente]
+MODIFICA: [testo esatto da aggiungere/sostituire]
+PRIORITÀ: [alta / media / bassa]
+```
+Poi attendi conferma di Fabio prima di modificare `CLAUDE.md`. Se Fabio annuncia la chiusura della sessione e non ha eseguito PATCH, proponilo autonomamente prima di concludere — **solo se** nella sessione sono emersi pattern non banali o gap ripetuti, non per un singolo bugfix minore.
+
+---
+
+## Auto-audit su ri-lettura di CLAUDE.md [UNIVERSALE]
+
+Se **a sessione già avviata** Fabio chiede di rileggere questo file (non il primo caricamento della sessione), non limitarti a "ricaricare" le regole in silenzio — esegui automaticamente un self-audit:
+1. Regole di questo `CLAUDE.md` violate finora nella sessione, con descrizione di cosa è successo
+2. Impatto sul lavoro già fatto — serve una correzione?
+3. Azione consigliata: aggiornare `CLAUDE.md`, eseguire PATCH, o solo prenderne nota
 
 ---
 
