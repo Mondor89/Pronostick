@@ -44,6 +44,7 @@
 - Se un bug è puramente visivo (layout rotto, colori sbagliati, elemento che non appare) e il codice sembra corretto, controllare PRIMA CSS/attributi/ordine di caricamento prima di sospettare la logica JS.
 - **Feedback in blocco** — se Fabio deve segnalare più correzioni sullo stesso output (codice, design doc, ecc.), può usare il formato `SEZIONE / PROBLEMA / AZIONE / DETTAGLIO` invece di prosa libera. Claude applica tutti i feedback ricevuti in un unico round, non uno alla volta.
 - Se una task aperta di `pronostick_stato.md` ha uno scopo ambiguo (può essere interpretata come piccola o grande), chiarire lo scopo con una domanda diretta a Fabio prima di trattarla come "una cosa sola" nel limite di complessità per sessione.
+- Le task aperte gated da soglie di dati non osservabili da Claude Code (es. N pronostici verificati, salvati solo in `localStorage`/Firestore) richiedono sempre una domanda diretta a Fabio sul valore attuale prima di iniziare l'implementazione, anche se la soglia sembra già superata secondo le note del task.
 
 ### Comandi speciali
 

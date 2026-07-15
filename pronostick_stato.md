@@ -8,8 +8,8 @@
 
 | Campo | Valore |
 |-------|--------|
-| **Ultimo aggiornamento** | 14/07/2026 |
-| **Ultima sessione** | Chiusura Bug Noti (Sonnet 5) — risolti tutti i 13 bug minori/UI aperti dalla code review precedente |
+| **Ultimo aggiornamento** | 15/07/2026 |
+| **Ultima sessione** | Analisi metodo AI Memory/pronostici (Sonnet 5) — nessun codice toccato, definita roadmap a 4 passi gated da soglie dati |
 | **Deploy** | https://pronostick.netlify.app/ |
 | **GitHub** | Mondor89/Pronostick |
 | **Tier Anthropic** | Tier 1 (modello consigliato: Haiku) |
@@ -17,7 +17,7 @@
 ---
 
 ## Focus Attuale
-App funzionante e deployata. Chiusi in questa sessione tutti e 13 i bug rimasti aperti dalla code review del 14/07/2026 (C1, C3-C7 minori/incoerenze + D1-D6 UI/UX) — nessun bug noto aperto al momento. Prossimo passo: sistema Tag Pattern per AI Memory.
+App funzionante e deployata, nessun bug noto aperto. Sessione del 15/07/2026: analisi (non implementazione) del metodo di generazione pronostici e del sistema di apprendimento da utilizzo (`buildPrompt`/`buildMemory`/verifica). Emersa una roadmap a 4 passi progressivi verso il Tag Pattern per AI Memory (vedi Task Aperte), attualmente bloccata sul primo gradino per mancanza di dati (2 pronostici verificati, servono almeno 5-6 per il primo passo).
 
 ---
 
@@ -33,8 +33,11 @@ App funzionante e deployata. Chiusi in questa sessione tutti e 13 i bug rimasti 
 
 ## Task Aperte
 
-### Priorità Alta
-- [ ] Sistema Tag Pattern per AI Memory (con 30+ pronostici verificati)
+### Priorità Alta — roadmap Memoria AI (analisi 15/07/2026, in ordine di esecuzione)
+- [ ] Spot-check affidabilità della verifica automatica (confrontare a mano 5-6 `verifica.nota_apprendimento` col risultato reale) — appena si arriva a 5-6 pronostici verificati. Prerequisito: oggi (15/07/2026) la pipeline di verifica (auto-giudizio AI su web search) non è mai stata validata contro un riscontro umano
+- [ ] Estendere la verifica ai singoli mercati (oggi giudica solo `pronostico_principale`, non i mercati Over/Under/1X2/GG in `entry.mercati`) — da fare PRIMA di qualsiasi statistica per-mercato, altrimenti quel dato resta incalcolabile
+- [ ] Statistiche di calibrazione aggregate nel prompt (bucket confidenza + bias per sport/mercato, riusando i dati già in `renderStats()`/`renderBiasPanel()` invece delle sole 8 "lezioni" testuali di `buildMemory()`) — quando si arriva a ~15-20 pronostici verificati. Alternativa più semplice al Tag Pattern, da provare prima
+- [ ] Sistema Tag Pattern completo per AI Memory — con 30+ pronostici verificati, **solo se** il passo sopra si rivela insufficiente
 - [ ] Upgrade modello a Sonnet quando Tier 2 (≥$40 spesi)
 
 ### Priorità Bassa
@@ -69,6 +72,7 @@ Nessun bug noto aperto al momento (chiusi tutti in sessione del 14/07/2026 — v
 | 14/07/2026 | Fabio ha scelto di risolvere tutti e 13 i bug noti in un'unica sessione, nonostante non fossero "correlati allo stesso punto del codice" (limite di complessità sessione) | Chiesto esplicitamente a Fabio con AskUserQuestion prima di iniziare, dato il conflitto con la regola — quasi tutti fix piccoli/localizzati, nessuno tocca dati/secret |
 | 14/07/2026 | C3: rimosso il valore precompilato "10" dal campo importo giocata (ora solo placeholder) invece di aggiungere un checkbox "ho giocato davvero" | Fix minimo coerente con la logica già esistente (0 = non conteggiato nel ROI), niente feature nuova per un bugfix |
 | 14/07/2026 | C4: creata regola CSS `#apikeyCard.configured` legata all'id reale invece di rinominare la card in `.apikey-card` | `.apikey-card` non era mai usata come classe HTML (solo `settings-card`) ed è stata rimossa come CSS morto nello stesso giro (C7) |
+| 15/07/2026 | Prima di costruire il Tag Pattern per AI Memory, si passa per una roadmap a 4 step progressivi (spot-check verifica → verifica per-mercato → statistiche di calibrazione aggregate → Tag Pattern) invece di implementarlo direttamente | Il Tag Pattern era un'idea "in pausa" mai validata nel design; con soli 2 pronostici verificati ora, e senza aver mai controllato l'affidabilità della pipeline di auto-verifica AI, costruire subito la soluzione complessa avrebbe rischiato di amplificare un segnale non validato |
 
 ---
 
@@ -89,6 +93,7 @@ Nessun bug noto aperto al momento (chiusi tutti in sessione del 14/07/2026 — v
 | Data | Attività |
 |------|----------|
 | 14/07/2026 | Chiusura di tutti i 13 bug noti rimasti dalla code review precedente (C1, C3-C7, D1-D6). Sessione esplicitamente autorizzata da Fabio a coprire tutti i bug insieme nonostante il limite di complessità. Fix principali: grafico ROI allineato ai KPI (quota_reale), rimosso precompilato 10€ dal calcolatore giocata, ripristinato feedback visivo "API key configurata", rimossi 4 rami di codice morto per web_search (mai eseguiti perché è un tool server-side), rimossi console.log residui, rimossa funzione `handleCardClick()` mai chiamata e CSS morto/duplicato (`.apikey-card`, `.hcard-top` e famiglia, `.btn-ricalcolo`, doppia `.hcard`, media query duplicate), aggiunto favicon, safe-area-inset-bottom sulla tab bar, `rel="noopener"` sui link esterni, fallback per Chart.js irraggiungibile, aria-label sui bottoni-icona, Backup esteso al calendario partite (con retrocompatibilità sui backup vecchi). Verificato dal vivo in anteprima locale via JS console (localStorage seeding, chiamate dirette alle funzioni, nessun errore console) per ogni fix. Falso allarme durante la sessione: un presunto bug di tag HTML rotti (`<\div>`/`<\span>`) visto nell'output del tool di lettura file si è rivelato un artefatto di visualizzazione — verificato con grep sul file reale, il codice è sempre stato corretto. Script pattern-trappola eseguito (solo il solito falso positivo backtick). REGISTRA eseguito: Fase 1 PATCH — nessun gap non banale emerso, nessuna modifica a CLAUDE.md. |
+| 15/07/2026 | Analisi (nessun codice toccato) del metodo AI di generazione pronostici e del sistema di apprendimento da utilizzo. Letti `buildPrompt()`, `buildMemory()`, `renderStats()`, `renderBiasPanel()` e la pipeline di verifica (`evalPrompt`). Trovato: le statistiche aggregate (win rate, ROI, confidenza media vs reale) esistono già in `renderStats()` ma non tornano mai nel prompt — `buildMemory()` inietta solo max 8 lezioni testuali scelte per sport/competizione; la verifica giudica solo il pronostico principale, non i singoli mercati, quindi oggi non è possibile calcolare bias per mercato; la pipeline di auto-verifica (AI che cerca il risultato e si autogiudica) non è mai stata validata contro un riscontro umano. Chiarito con Fabio che Claude Code (Sonnet 5) è lo strumento corretto per questa analisi, non serve un modello diverso (Fable 5) — è un lavoro di prompt engineering/architettura dati. Definita una roadmap a 4 step gated da soglie di pronostici verificati (oggi: 2) invece di costruire subito il Tag Pattern. REGISTRA eseguito: Fase 1 PATCH — 1 gap trovato e applicato (vedi Decisioni Prese e CLAUDE.md). |
 
 ## Archivio Log
 > Sessioni e decisioni più vecchie, spostate qui il 14/07/2026 per restare sotto le 150 righe — dettaglio ridotto, il codice/git history restano la fonte primaria per i dettagli tecnici.
