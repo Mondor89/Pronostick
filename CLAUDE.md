@@ -218,12 +218,14 @@ Pronostick/
 ├── index.html                       ← app single-file (HTML+CSS+JS inline, ~4800+ righe)
 ├── pronostick_stato.md               ← stato, task, decisioni, alternative, bug noti, log
 ├── pronostick_sicurezza.md           ← invarianti di sicurezza
-├── pronostick_calendario_project.md  ← istruzioni del Project claude.ai esterno (ricerca calendario, uso Pro incluso)
+├── pronostick_calendario_project.md  ← istruzioni del Project claude.ai esterno (ricerca calendario, alternativa alla skill sotto)
 ├── firestore.rules                   ← regole di sicurezza Firestore (versione di riferimento, va pubblicata a mano in Firebase Console)
 ├── netlify.toml                      ← config deploy Netlify
 ├── netlify/functions/proxy.js        ← proxy serverless verso Anthropic API (BYOK)
 ├── scripts/check-known-bug-patterns.sh  ← controllo euristico pre-commit dei pattern-trappola noti
 ├── .claude/launch.json               ← config server locale di anteprima (Python http.server, porta 8080)
+├── .claude/skills/cerca-calendario/SKILL.md  ← skill Claude Code per ricerca calendario (stesso piano Pro, sostituisce il Project esterno)
+├── calendario/                       ← output ricerca calendario (JSON), gitignored, temporaneo
 ├── .gitignore
 └── .gitattributes                    ← forza LF sugli .sh (evita rotture da autocrlf Windows)
 ```
@@ -281,6 +283,7 @@ Messaggio commit: `Sessione N — [funzionalità] / [cosa fatto] / [cosa resta]`
 - Quando Pronostick accetta un blocco di dati strutturati da una fonte esterna (incolla, upload, risposta di un tool/AI esterno), l'escaping a schermo (vedi sopra) non basta: va aggiunta una validazione esplicita per campo (tipo, formato, obbligatorietà) PRIMA del salvataggio.
 - Le righe che non superano la validazione vanno scartate con un motivo visibile all'utente, mai in modo silenzioso — stesso principio del fallback silenzioso applicato all'import bulk (vedi "Principi di debug e architettura").
 - Esempio applicato: `importaCalendarioIncollato()` in `index.html` (15/07/2026) — valida `team1`/`team2`/`data`/`ora`/`competizione` riga per riga, riepilogo con conteggio scartate + motivo.
+- **La validazione di formato non basta a garantire la correttezza semantica** di un dato prodotto da un passo di ricerca/generazione AI (nome completato per inferenza, data assegnata da un riepilogo aggregato) — quando il dato esterno arriva da una ricerca AI (non solo da incolla/upload diretto dell'utente), serve anche un controllo a campione contro la fonte originale prima di considerarlo affidabile. Caso reale: primo test della skill `cerca-calendario` (15/07/2026) — un nome giocatore inventato ("Facundo Diaz Acosta" invece del solo "Gomez" dato dalla fonte) e una data sbagliata (partite del 14/07 lette come "oggi" da un riepilogo di ricerca aggregato) sono passati indenni dalla validazione di formato, perché sintatticamente corretti. Vedi `.claude/skills/cerca-calendario/SKILL.md`.
 
 ### localStorage — chiave stabile [PERMANENTE]
 - `pronostick_apikey`, `pronostick_v3_history`, `pronostick_model` sono le chiavi correnti — non cambiarle senza gestire esplicitamente la migrazione dei dati esistenti (vedi `loadHistory()` per il pattern di migrazione già usato).

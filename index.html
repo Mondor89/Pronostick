@@ -1845,14 +1845,16 @@ body { padding-bottom: calc(70px + env(safe-area-inset-bottom)); } /* space for 
   <!-- Paste import -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:20px;">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;" onclick="toggleCalPasteImport()">
-      <div style="font-size:0.85rem;font-weight:600;">📋 Incolla risultato ricerca (Project esterno)</div>
+      <div style="font-size:0.85rem;font-weight:600;">📋 Incolla o carica risultato ricerca</div>
       <span id="calPasteArrow" style="color:var(--muted);font-size:0.8rem;">▼</span>
     </div>
     <div id="calPasteBody" style="display:none;margin-top:12px;">
-      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px;">Incolla qui il JSON prodotto dal Project claude.ai dedicato alla ricerca calendario.</div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px;">Incolla qui il JSON prodotto dalla ricerca calendario (Project claude.ai esterno o skill Claude Code), oppure carica direttamente il file.</div>
       <textarea id="calPasteText" placeholder='{"sport":"Calcio Serie A","partite":[...]}' style="width:100%;min-height:110px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-family:monospace;font-size:0.78rem;outline:none;resize:vertical;"></textarea>
+      <input type="file" id="calFileInput" accept=".json,application/json" style="display:none;" onchange="handleCalFileUpload(event)">
       <div style="display:flex;gap:8px;margin-top:10px;">
         <button onclick="importaCalendarioIncollato()" id="btnImportCal" style="background:var(--accent);color:var(--bg);border:none;border-radius:8px;padding:9px 18px;font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:1.5px;cursor:pointer;">📥 IMPORTA</button>
+        <button onclick="document.getElementById('calFileInput').click()" id="btnCalFile" style="background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:9px 18px;font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:1.5px;cursor:pointer;">📎 CARICA FILE</button>
       </div>
       <div id="calPasteStatus" style="margin-top:10px;font-size:0.78rem;display:none;"></div>
     </div>
@@ -3474,6 +3476,27 @@ function toggleCalPasteImport() {
   const open = body.style.display !== 'none';
   body.style.display = open ? 'none' : 'block';
   arrow.textContent = open ? '▼' : '▲';
+}
+
+function handleCalFileUpload(event) {
+  const input = event.target;
+  const file = input.files && input.files[0];
+  if (!file) return;
+
+  const status = document.getElementById('calPasteStatus');
+  const reader = new FileReader();
+  reader.onload = function() {
+    document.getElementById('calPasteText').value = reader.result;
+    input.value = '';
+    importaCalendarioIncollato();
+  };
+  reader.onerror = function() {
+    status.style.display = 'block';
+    status.style.color = 'var(--danger)';
+    status.textContent = '❌ Impossibile leggere il file.';
+    input.value = '';
+  };
+  reader.readAsText(file);
 }
 
 function importaCalendarioIncollato() {
