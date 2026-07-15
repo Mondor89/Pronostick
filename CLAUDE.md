@@ -218,6 +218,7 @@ Pronostick/
 ├── index.html                       ← app single-file (HTML+CSS+JS inline, ~4800+ righe)
 ├── pronostick_stato.md               ← stato, task, decisioni, alternative, bug noti, log
 ├── pronostick_sicurezza.md           ← invarianti di sicurezza
+├── pronostick_calendario_project.md  ← istruzioni del Project claude.ai esterno (ricerca calendario, uso Pro incluso)
 ├── firestore.rules                   ← regole di sicurezza Firestore (versione di riferimento, va pubblicata a mano in Firebase Console)
 ├── netlify.toml                      ← config deploy Netlify
 ├── netlify/functions/proxy.js        ← proxy serverless verso Anthropic API (BYOK)
@@ -275,6 +276,11 @@ Messaggio commit: `Sessione N — [funzionalità] / [cosa fatto] / [cosa resta]`
 - Qualsiasi valore da un campo utente **o generato dall'AI** che finisce in `innerHTML` va passato da `escapeHtml()` — applicato in modo coerente in TUTTI i punti dove quel dato viene renderizzato (in `index.html`: `renderResult()`, `buildFullDetailHTML()`, `buildCompactCardDOM()`, `renderCalendario()`, `renderStats()`, `renderCombinataResult()`, `buildMercatiConsigliati()`, `renderGiocataResult()`, `renderBiasPanel()`).
 - **L'elenco è indicativo, non esaustivo** — ogni nuova funzione che inserisce dati esterni/utente/output AI in `innerHTML` va aggiunta qui e verificata con `escapeHtml()`. Trovata il 14/07/2026 una violazione in `renderCalendario()` non coperta da questo elenco: non fidarsi solo della lista, controllare ogni funzione che scrive `innerHTML`.
 - **Come verificare un fix di escaping:** iniettare lo stesso payload XSS (es. `<img src=x onerror=...>`) in TUTTI i campi sospetti di tutte le funzioni coinvolte in un solo giro di test, invece che uno alla volta — più veloce, copre l'intera superficie in un colpo (tecnica usata con successo il 14/07/2026 su 7 funzioni in parallelo).
+
+### Import/parsing di dati esterni strutturati — validare, non solo escapare [PERMANENTE]
+- Quando Pronostick accetta un blocco di dati strutturati da una fonte esterna (incolla, upload, risposta di un tool/AI esterno), l'escaping a schermo (vedi sopra) non basta: va aggiunta una validazione esplicita per campo (tipo, formato, obbligatorietà) PRIMA del salvataggio.
+- Le righe che non superano la validazione vanno scartate con un motivo visibile all'utente, mai in modo silenzioso — stesso principio del fallback silenzioso applicato all'import bulk (vedi "Principi di debug e architettura").
+- Esempio applicato: `importaCalendarioIncollato()` in `index.html` (15/07/2026) — valida `team1`/`team2`/`data`/`ora`/`competizione` riga per riga, riepilogo con conteggio scartate + motivo.
 
 ### localStorage — chiave stabile [PERMANENTE]
 - `pronostick_apikey`, `pronostick_v3_history`, `pronostick_model` sono le chiavi correnti — non cambiarle senza gestire esplicitamente la migrazione dei dati esistenti (vedi `loadHistory()` per il pattern di migrazione già usato).

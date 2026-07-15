@@ -1842,6 +1842,22 @@ body { padding-bottom: calc(70px + env(safe-area-inset-bottom)); } /* space for 
     <div id="calSearchStatus" style="margin-top:10px;font-size:0.78rem;color:var(--muted);display:none;"></div>
   </div>
 
+  <!-- Paste import -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;" onclick="toggleCalPasteImport()">
+      <div style="font-size:0.85rem;font-weight:600;">📋 Incolla risultato ricerca (Project esterno)</div>
+      <span id="calPasteArrow" style="color:var(--muted);font-size:0.8rem;">▼</span>
+    </div>
+    <div id="calPasteBody" style="display:none;margin-top:12px;">
+      <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px;">Incolla qui il JSON prodotto dal Project claude.ai dedicato alla ricerca calendario.</div>
+      <textarea id="calPasteText" placeholder='{"sport":"Calcio Serie A","partite":[...]}' style="width:100%;min-height:110px;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:10px 12px;border-radius:8px;font-family:monospace;font-size:0.78rem;outline:none;resize:vertical;"></textarea>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button onclick="importaCalendarioIncollato()" id="btnImportCal" style="background:var(--accent);color:var(--bg);border:none;border-radius:8px;padding:9px 18px;font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:1.5px;cursor:pointer;">📥 IMPORTA</button>
+      </div>
+      <div id="calPasteStatus" style="margin-top:10px;font-size:0.78rem;display:none;"></div>
+    </div>
+  </div>
+
   <!-- Results -->
   <div id="calendarioList"></div>
 
@@ -3450,6 +3466,96 @@ async function cercaPartite() {
   }
   btn.disabled = false;
   btn.textContent = '🔍 CERCA PARTITE';
+}
+
+function toggleCalPasteImport() {
+  const body = document.getElementById('calPasteBody');
+  const arrow = document.getElementById('calPasteArrow');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  arrow.textContent = open ? '▼' : '▲';
+}
+
+function importaCalendarioIncollato() {
+  const status = document.getElementById('calPasteStatus');
+  const raw = document.getElementById('calPasteText').value.trim();
+  status.style.display = 'block';
+  status.style.color = 'var(--muted)';
+
+  if (!raw) { status.style.color = 'var(--danger)'; status.textContent = '⚠️ Incolla prima il JSON.'; return; }
+
+  let parsed;
+  try {
+    const t = raw;
+    parsed = JSON.parse(t.slice(t.indexOf('{'), t.lastIndexOf('}') + 1));
+  } catch (e) {
+    status.style.color = 'var(--danger)';
+    status.textContent = '❌ JSON non valido: ' + e.message;
+    return;
+  }
+
+  const rawPartite = Array.isArray(parsed.partite) ? parsed.partite : [];
+  if (!rawPartite.length) {
+    status.style.color = 'var(--danger)';
+    status.textContent = '❌ Nessuna partita trovata nel campo "partite".';
+    return;
+  }
+
+  const sportTop = (typeof parsed.sport === 'string' && parsed.sport.trim()) ? parsed.sport.trim() : null;
+  const dataRe = /^\d{4}-\d{2}-\d{2}$/;
+  const oraRe = /^\d{2}:\d{2}$/;
+
+  const valid = [];
+  const errors = [];
+  rawPartite.forEach(function(p, i) {
+    const reasons = [];
+    if (typeof p.team1 !== 'string' || !p.team1.trim()) reasons.push('team1 mancante');
+    if (typeof p.team2 !== 'string' || !p.team2.trim()) reasons.push('team2 mancante');
+    if (typeof p.data !== 'string' || !dataRe.test(p.data)) reasons.push('data non in formato YYYY-MM-DD');
+    if (p.ora !== null && p.ora !== undefined && (typeof p.ora !== 'string' || !oraRe.test(p.ora))) reasons.push('ora non in formato HH:MM');
+    if (typeof p.competizione !== 'string' || !p.competizione.trim()) reasons.push('competizione mancante');
+    if (reasons.length) {
+      errors.push('Riga ' + (i + 1) + ' (' + (p.team1 || '?') + ' vs ' + (p.team2 || '?') + '): ' + reasons.join(', '));
+      return;
+    }
+    valid.push({
+      team1: p.team1.trim(),
+      team2: p.team2.trim(),
+      data: p.data,
+      ora: (p.ora === null || p.ora === undefined) ? null : p.ora,
+      competizione: p.competizione.trim(),
+      stadio: (typeof p.stadio === 'string' && p.stadio.trim()) ? p.stadio.trim() : null,
+      sport: sportTop || p.competizione.trim()
+    });
+  });
+
+  const existing = loadCalendario();
+  const existingKeys = new Set(existing.map(p => p.team1 + '|' + p.team2 + '|' + p.data));
+
+  let added = 0, duplicates = 0;
+  valid.forEach(function(p) {
+    const key = p.team1 + '|' + p.team2 + '|' + p.data;
+    if (existingKeys.has(key)) { duplicates++; return; }
+    p.id = Date.now().toString() + Math.random().toString(36).slice(2);
+    p.savedAt = new Date().toISOString();
+    existing.push(p);
+    existingKeys.add(key);
+    added++;
+  });
+
+  existing.sort(function(a, b) { return new Date(a.data) - new Date(b.data); });
+  saveCalendario(existing);
+  renderCalendario();
+
+  const summary = rawPartite.length + ' ricevute · ' + added + ' aggiunte · ' + duplicates + ' già presenti' + (errors.length ? ' · ' + errors.length + ' scartate' : '');
+  status.style.color = errors.length ? 'var(--gold)' : 'var(--accent)';
+  status.innerHTML = '✅ ' + escapeHtml(summary)
+    + (errors.length ? '<div style="margin-top:6px;color:var(--danger);white-space:pre-line;">' + errors.map(escapeHtml).join('\n') + '</div>' : '');
+
+  if (added > 0) {
+    document.getElementById('calPasteText').value = '';
+    showToast('✅ ' + added + ' partite importate', 'success');
+  }
 }
 
 function renderCalendario() {
