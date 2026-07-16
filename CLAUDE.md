@@ -186,7 +186,7 @@ Se emerge un bug altrove, annotarlo in "Bug Noti" di `pronostick_stato.md` e tor
 
 ### 3. Costo API sotto controllo [PERMANENTE]
 **Perché:** un uso non monitorato dell'API Anthropic (a consumo) può generare costi imprevisti sull'account dell'utente.
-**Cosa:** il pannello costi (Token AI, Web Search, Cerca Quote) resta sempre visibile e aggiornato prima di operazioni che consumano token.
+**Cosa:** il pannello costi (Token AI, Web Search, Cerca Quote) resta sempre visibile e aggiornato prima di operazioni che consumano token. Vale anche fuori dal pannello dedicato di Analizza: ogni bottone che genera una chiamata all'API Anthropic deve mostrare una stima di costo visibile prima del click, anche approssimativa — vedi `updateGiocataCost()` (tab Giocata) e l'etichetta `~$0.10` accanto al bottone Verifica Risultato in Storico (aggiunta 16/07/2026, prima non c'era alcuna stima).
 
 ### 4. Gioco responsabile sempre visibile [PERMANENTE]
 **Perché:** l'app tratta scommesse sportive — un pronostico AI non è mai una garanzia di vincita.
@@ -275,9 +275,10 @@ Messaggio commit: `Sessione N — [funzionalità] / [cosa fatto] / [cosa resta]`
 - `${variabile}` funziona SOLO dentro backtick. Dentro apici singoli/doppi è testo letterale, non viene mai sostituito.
 
 ### Escaping HTML — mai fidarsi dell'input, nemmeno il proprio [PERMANENTE]
-- Qualsiasi valore da un campo utente **o generato dall'AI** che finisce in `innerHTML` va passato da `escapeHtml()` — applicato in modo coerente in TUTTI i punti dove quel dato viene renderizzato (in `index.html`: `renderResult()`, `buildFullDetailHTML()`, `buildCompactCardDOM()`, `renderCalendario()`, `renderStats()`, `renderCombinataResult()`, `buildMercatiConsigliati()`, `renderGiocataResult()`, `renderBiasPanel()`).
+- Qualsiasi valore da un campo utente **o generato dall'AI** che finisce in `innerHTML` va passato da `escapeHtml()` — applicato in modo coerente in TUTTI i punti dove quel dato viene renderizzato (in `index.html`: `renderResult()`, `buildFullDetailHTML()`, `buildCompactCardDOM()`, `renderCalendario()`, `renderStats()`, `renderCombinataResult()`, `buildMercatiConsigliati()`, `renderGiocataResult()`, `renderBiasPanel()`, `verificaRisultato()`).
 - **L'elenco è indicativo, non esaustivo** — ogni nuova funzione che inserisce dati esterni/utente/output AI in `innerHTML` va aggiunta qui e verificata con `escapeHtml()`. Trovata il 14/07/2026 una violazione in `renderCalendario()` non coperta da questo elenco: non fidarsi solo della lista, controllare ogni funzione che scrive `innerHTML`.
 - **Come verificare un fix di escaping:** iniettare lo stesso payload XSS (es. `<img src=x onerror=...>`) in TUTTI i campi sospetti di tutte le funzioni coinvolte in un solo giro di test, invece che uno alla volta — più veloce, copre l'intera superficie in un colpo (tecnica usata con successo il 14/07/2026 su 7 funzioni in parallelo).
+- **Non fidarsi solo dell'elenco di funzioni note: eseguire `grep -n '\.innerHTML' index.html` su tutto il file** quando si verifica/estende questo invariante — attenzione particolare a path di rendering duplicati per lo stesso dato (es. un aggiornamento "live" scritto subito dopo una chiamata API, e un re-render successivo della stessa UI da dati salvati). I due path possono divergere silenziosamente nell'escaping anche se l'entità è coperta altrove: trovato il 16/07/2026 in `verificaRisultato()` (scriveva il pannello senza escaping subito dopo la chiamata AI) mentre `buildCompactCardDOM()` ridisegnava lo stesso pannello correttamente escapato dai dati salvati. Lo script `scripts/check-known-bug-patterns.sh` ha un controllo [5] dedicato (blocchi `innerHTML =` per concatenazione senza `escapeHtml()` nelle righe successive) ma resta euristico, non sostituisce il grep manuale.
 
 ### Import/parsing di dati esterni strutturati — validare, non solo escapare [PERMANENTE]
 - Quando Pronostick accetta un blocco di dati strutturati da una fonte esterna (incolla, upload, risposta di un tool/AI esterno), l'escaping a schermo (vedi sopra) non basta: va aggiunta una validazione esplicita per campo (tipo, formato, obbligatorietà) PRIMA del salvataggio.

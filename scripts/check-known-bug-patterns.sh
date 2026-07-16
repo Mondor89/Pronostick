@@ -46,6 +46,17 @@ if grep -nP '\$\{(team1|team2|competition|sport|matchDate)[^}]*\}' "$FILE" | gre
 fi
 
 echo ""
+echo "--- [5] Blocchi .innerHTML = per concatenazione '+' senza escapeHtml() nelle 15 righe successive ---"
+INNERHTML_LINES=$(grep -nP "\.innerHTML\s*=\s*['\"]" "$FILE" | cut -d: -f1)
+for ln in $INNERHTML_LINES; do
+  snippet=$(sed -n "${ln},$((ln+15))p" "$FILE")
+  if ! echo "$snippet" | grep -q 'escapeHtml'; then
+    echo "$ln: blocco innerHTML= senza escapeHtml() nelle 15 righe successive — verificare a mano"
+    FOUND=1
+  fi
+done
+
+echo ""
 echo "======================================"
 if [ "$FOUND" -eq 1 ]; then
   echo "Trovate righe da rivedere manualmente (vedi sopra). Non tutti i match sono bug reali: e' un controllo euristico."

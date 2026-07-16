@@ -4357,8 +4357,14 @@ function buildCompactCardDOM(e) {
   btnVerifica.id = 'verificaBtn_' + e.id;
   btnVerifica.dataset.id = e.id;
   btnVerifica.textContent = e.verifica ? '🔍 RIVERIFICA' : '🔍 VERIFICA RISULTATO';
+  btnVerifica.title = 'Consuma token: ricerca web + valutazione AI (~$0.10)';
   btnVerifica.onclick = function() { verificaRisultato(e.id); };
   btnRow.appendChild(btnVerifica);
+
+  var verificaCostLabel = document.createElement('span');
+  verificaCostLabel.style.cssText = 'font-size:0.7rem;color:var(--muted);align-self:center;';
+  verificaCostLabel.textContent = '~$0.10';
+  btnRow.appendChild(verificaCostLabel);
 
   var btnRicalcola = document.createElement('button');
   btnRicalcola.className = 'btn-verifica';
@@ -4695,17 +4701,17 @@ async function verificaRisultato(id) {
     const esitoColor = v.esito_scommessa === 'VINTO' ? 'var(--accent)' : v.esito_scommessa === 'PERSO' ? 'var(--danger)' : 'var(--gold)';
 
     panel.innerHTML = '<div class="verifica-header ' + headerClass + '">'
-      + '<span class="verifica-esito" style="color:' + esitoColor + '">' + esitoIcon + ' ' + v.esito_scommessa + ' — ' + v.accuratezza + '</span>'
-      + '<span class="verifica-score">Risultato reale: <strong>' + v.punteggio_reale + '</strong></span>'
+      + '<span class="verifica-esito" style="color:' + esitoColor + '">' + esitoIcon + ' ' + escapeHtml(v.esito_scommessa) + ' — ' + escapeHtml(v.accuratezza) + '</span>'
+      + '<span class="verifica-score">Risultato reale: <strong>' + escapeHtml(v.punteggio_reale || '') + '</strong></span>'
       + '</div>'
       + '<div class="verifica-body"><div class="verifica-row">'
-      + '<div class="verifica-item"><div class="verifica-key">Pronostico dato</div><div class="verifica-val">' + entry.pronostico + '</div></div>'
-      + '<div class="verifica-item"><div class="verifica-key">Esito reale</div><div class="verifica-val">' + v.vincitore_reale + '</div></div>'
-      + '<div class="verifica-item"><div class="verifica-key">✅ Cosa ha indovinato</div><div class="verifica-val ok">' + v.cosa_ha_indovinato + '</div></div>'
-      + '<div class="verifica-item"><div class="verifica-key">❌ Cosa ha sbagliato</div><div class="verifica-val ko">' + v.cosa_ha_sbagliato + '</div></div>'
+      + '<div class="verifica-item"><div class="verifica-key">Pronostico dato</div><div class="verifica-val">' + escapeHtml(entry.pronostico || '') + '</div></div>'
+      + '<div class="verifica-item"><div class="verifica-key">Esito reale</div><div class="verifica-val">' + escapeHtml(v.vincitore_reale || '') + '</div></div>'
+      + '<div class="verifica-item"><div class="verifica-key">✅ Cosa ha indovinato</div><div class="verifica-val ok">' + escapeHtml(v.cosa_ha_indovinato || '') + '</div></div>'
+      + '<div class="verifica-item"><div class="verifica-key">❌ Cosa ha sbagliato</div><div class="verifica-val ko">' + escapeHtml(v.cosa_ha_sbagliato || '') + '</div></div>'
       + '</div>'
       + '<div class="verifica-key" style="margin-bottom:8px">🧠 Nota di Apprendimento</div>'
-      + '<div class="verifica-note">' + v.nota_apprendimento + '</div>'
+      + '<div class="verifica-note">' + escapeHtml(v.nota_apprendimento || '') + '</div>'
       + '</div>';
     panel.classList.add('visible');
     panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
