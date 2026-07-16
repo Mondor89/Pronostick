@@ -65,6 +65,12 @@ il formato, mostrando il motivo. Prima di consegnare il file, ricontrolla tu ste
 contro questo schema: hai il parser reale in `index.html` a disposizione, usalo per validare,
 non fidarti solo di aver seguito lo schema a memoria.
 
+**Più sport in un'unica richiesta:** resta comunque un solo JSON con un unico array `partite` a
+livello radice — mai un wrapper per-sport (es. `{"ricerche": [...]}`), il parser reale non lo
+legge e fallirebbe silenziosamente con "Nessuna partita trovata". Usa il campo `competizione` di
+ogni riga per distinguere sport/torneo, e `sport` in alto per descrivere l'ambito complessivo
+(es. `"Multi (Calcio + Tennis + Basket)"`).
+
 ## Whitelist competizioni "principali" (screening)
 
 Elenco iniziale, **non esaustivo** — si arricchisce nel tempo con `!patch` (vedi sotto):
@@ -108,3 +114,4 @@ Attendi conferma, poi aggiorna questo stesso file + una riga nel changelog in fo
 |---|---|---|
 | 1.0 | 15/07/2026 | Migrazione da Project claude.ai esterno (`pronostick_calendario_project.md`) a skill Claude Code — stesso schema/whitelist/disciplina, output ora su file locale invece che in chat |
 | 1.1 | 15/07/2026 | Primo test end-to-end reale (Tennis ATP): trovati e corretti un nome inventato ("Facundo Diaz Acosta" al posto del solo "Gomez" dato dalla fonte) e una data sbagliata (partite del 14/07 lette come "oggi" dal riepilogo aggregato). Aggiunti i punti 5-6 alla Procedura |
+| 1.2 | 16/07/2026 | Prima ricerca reale multi-sport (Calcio + Tennis + Basket in un'unica richiesta): la sessione ha usato un wrapper `{"ricerche": [...]}` che il parser reale non avrebbe letto, scoperto e corretto prima di consegnare grazie alla verifica contro `index.html`. Aggiunta indicazione esplicita allo Schema di output su come strutturare l'output multi-sport (un solo array `partite` a livello radice) |
