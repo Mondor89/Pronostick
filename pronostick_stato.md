@@ -36,7 +36,7 @@ App funzionante e deployata, nessun bug noto aperto. Roadmap Memoria AI (vedi Ta
 ## Task Aperte
 
 ### Pronostick.Code — roadmap (avviato 26/07/2026)
-- [ ] Primo test end-to-end reale della skill `analizza-locale` (analisi + verifica su una partita vera) — solo le fondamenta sono state costruite, mai ancora eseguita
+- [ ] Primo test end-to-end reale della skill `analizza-locale` (analisi + verifica su una partita vera) — solo le fondamenta sono state costruite, mai ancora eseguita. **Farlo prima della Sessione 2 (dashboard)**: `cerca-calendario` al primo uso reale ha trovato 2 bug non prevedibili a tavolino (nome inventato, data sbagliata) — se lo schema/lezioni di `analizza-locale` avesse bisogno di un `!patch`, meglio scoprirlo prima di dover rifare anche la UI sopra
 - [ ] Sessione 2 — dashboard (`Pronostick.Code/dashboard.html`, File System Access API, stesso stile/CSS dell'app originale)
 - [ ] Sessione 3 — Guida/FAQ dedicata al processo Claude Code (`Pronostick.Code/istruzioni.html`)
 
