@@ -231,8 +231,9 @@ Pronostick/
 ├── calendario/                       ← output ricerca calendario (JSON), gitignored, temporaneo
 ├── Pronostick.Code/                  ← laboratorio locale separato, motore Claude Code invece di API — vedi sezione dedicata sotto
 │   ├── LEGGIMI.md
+│   ├── dashboard.html                ← dashboard + guida unificate (File System Access API, lettura/scrittura locale)
 │   ├── pronostici/                   ← gitignored
-│   └── _inbox/                       ← gitignored, riservata alla futura dashboard
+│   └── _inbox/                       ← gitignored, non ancora usata dalla dashboard attuale (riservata a un eventuale uso futuro)
 ├── .gitignore
 └── .gitattributes                    ← forza LF sugli .sh (evita rotture da autocrlf Windows)
 ```
@@ -245,6 +246,8 @@ Se `index.html` dovesse superare le ~6000 righe o servissero più pagine distint
 
 **Cosa è:** un secondo "motore" per Pronostick, isolato in `Pronostick.Code/` — genera e verifica pronostici usando le capacità native di Claude Code (WebSearch + ragionamento) invece dell'API Anthropic a pagamento, a costo zero (incluso nel piano Pro di Fabio). Nasce per affinare il ragionamento di analisi senza spendere credito ad ogni iterazione, prima di eventualmente portare un miglioramento nel Pronostick reale.
 
+**Aggiornamento 26/07/2026 (stessa giornata):** non è solo un laboratorio di ragionamento — Fabio lo usa esattamente come il Pronostick vero, comprese le giocate con soldi reali (cambia solo il motore). `Pronostick.Code/dashboard.html` traccia `importo_giocato`/`quota_reale` per pronostico, con KPI (Investito/Vinto/Profitto/ROI Reale) e grafico ROI — stessa logica di `renderStats()`/`renderRoiChart()` in `index.html`. "Costo zero" resta riferito solo al costo dell'API/piano Pro, non implica assenza di soldi reali in gioco.
+
 **Perché una cartella separata e non un'estensione di `index.html`:** il Pronostick reale è già un prodotto valido in uso. Un'architettura ibrida (stesso storico/statistiche condivisi tra due motori) sarebbe stata una decisione difficile da disfare — isolare tutto in una sandbox separata rende l'esperimento reversibile, senza nessun rischio per dati/architettura del prodotto reale (vedi Registro Decisioni in `pronostick_stato.md`, 26/07/2026).
 
 **Confini netti:**
@@ -253,6 +256,7 @@ Se `index.html` dovesse superare le ~6000 righe o servissero più pagine distint
 - Analisi **e** verifica sono entrambe compito di Claude Code (WebSearch nativo) — non solo l'analisi, per avere un ciclo di "lezioni apprese" coerente con un unico metro di giudizio
 - Un eventuale miglioramento di ragionamento scoperto qui va portato nel Pronostick reale (`buildPrompt()`) sempre a mano — mai un sync automatico tra le due basi di codice
 - Nessun confronto automatico tra i due motori integrato nella skill — un eventuale confronto side-by-side resta una scelta manuale e occasionale di Fabio
+- `dashboard.html` include anche la guida (unificate in un'unica pagina con toggle Dashboard/Guida il 26/07/2026, eliminato il file `istruzioni.html` separato) e usa la File System Access API in lettura/scrittura solo sulla cartella `pronostici/` locale — resta comunque isolata da `index.html`/localStorage/Firestore, stesso principio del primo punto
 - Skill che lo governa: `.claude/skills/analizza-locale/SKILL.md`. Roadmap a fasi (motore → dashboard → guida): vedi `Pronostick.Code/LEGGIMI.md` e Task Aperte in `pronostick_stato.md`
 
 **Governance:** Pronostick.Code non ha un proprio ciclo RIEPILOGO/REGISTRA separato — resta sotto lo stesso `CLAUDE.md`/REGISTRA di Pronostick, essendo una sotto-cartella dello stesso repository. Se in futuro crescesse fino a giustificarlo, valutare una governance dedicata come per il progetto gemello Bracco.

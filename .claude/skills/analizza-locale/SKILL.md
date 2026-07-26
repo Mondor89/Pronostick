@@ -20,6 +20,11 @@ description: Genera e verifica pronostici sportivi in locale usando le capacità
   giudica cosa è stato indovinato/sbagliato, scrive una lezione
 - Applica automaticamente le lezioni apprese dai pronostici già verificati per migliorare i
   pronostici successivi (stessa logica di `buildMemory()` in `index.html`)
+- Traccia l'importo realmente giocato e la quota reale (`importo_giocato`/`quota_reale`) per i
+  pronostici su cui Fabio decide di scommettere soldi veri, con KPI e grafico ROI calcolati in
+  `dashboard.html` — stessa logica di `renderStats()`/`renderRoiChart()` in `index.html`. Questi due
+  campi **non** li compila la skill: restano `null` all'analisi, Fabio li inserisce direttamente
+  nella dashboard (campi editabili) quando piazza la giocata reale
 
 ## Cosa NON fa
 
@@ -85,6 +90,8 @@ description: Genera e verifica pronostici sportivi in locale usando le capacità
   "consiglio_aggiuntivo": "",
   "value_bet_principale": true,
   "value_bet_score": "numero o null",
+  "importo_giocato": null,
+  "quota_reale": null,
   "mercati": {
     "mercato_over_under_2_5": {
       "consiglio": "es. Over 2.5", "probabilita": 0,
@@ -103,6 +110,10 @@ description: Genera e verifica pronostici sportivi in locale usando le capacità
   "verifica": null
 }
 ```
+
+`importo_giocato`/`quota_reale` restano sempre `null` nell'output dell'analisi: sono soldi reali,
+li inserisce solo Fabio nella dashboard (`dashboard.html`, campi editabili nella card) quando decide
+di piazzare la giocata — non vanno mai valorizzati dalla skill, nemmeno come stima.
 
 ## Schema di output — verifica (allineato a `verificaRisultato()` in `index.html`)
 
@@ -159,3 +170,4 @@ Attendi conferma, poi aggiorna questo stesso file + una riga nel changelog in fo
 | Versione | Data | Modifica |
 |---|---|---|
 | 1.0 | 26/07/2026 | Prima versione — Sessione 1 di Pronostick.Code (fondamenta: struttura cartelle + questa skill, nessuna dashboard ancora) |
+| 1.1 | 26/07/2026 | Aggiunti `importo_giocato`/`quota_reale` allo schema (sempre `null` dalla skill, compilati da Fabio in `dashboard.html`) — Fabio usa Pronostick.Code con soldi reali, non solo come laboratorio di ragionamento: la dashboard ora traccia KPI/ROI reali su queste giocate |
