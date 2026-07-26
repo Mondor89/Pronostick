@@ -265,6 +265,7 @@ Se `index.html` dovesse superare le ~6000 righe o servissero più pagine distint
 - [ ] VERIFICA-SICUREZZA eseguito se tocca dati/secret/input esterni
 - [ ] Fabio ha approvato prima dell'implementazione
 - [ ] Testato manualmente end-to-end (flusso reale)
+- [ ] Se la funzionalità dipende da un dialogo nativo del sistema operativo (File System Access API, file picker, ecc.), il flusso reale va sempre testato a mano da Fabio — l'automazione del browser non può interagire con elementi fuori dal DOM della pagina
 - [ ] Casi edge testati (input vuoto, errore rete/API, dato malformato)
 - [ ] Nessun `console.log`/debug rimasto
 - [ ] `pronostick_stato.md` aggiornato
