@@ -28,5 +28,6 @@ scoperto qui va portato nel Pronostick reale (`buildPrompt()` in `index.html`) s
 ## Roadmap
 
 - [x] Sessione 1 — fondamenta (questa cartella + skill `analizza-locale`)
-- [ ] Sessione 2 — dashboard (`dashboard.html`, File System Access API, stesso stile dell'app originale)
+- [x] Prima analisi reale: Musetti vs Arnaldi (ATP 500 Washington, 27/07/2026) — verifica in sospeso, farla appena la partita è giocata
+- [x] Sessione 2 — dashboard (`dashboard.html`, File System Access API, stesso stile dell'app originale) — costruita prima del completamento della verifica sopra, da rivedere se la verifica rivela un problema di schema
 - [ ] Sessione 3 — Guida/FAQ dedicata al processo Claude Code

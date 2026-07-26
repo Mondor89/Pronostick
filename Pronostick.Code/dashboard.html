@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Pronostick.Code — Dashboard</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎯</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0c0f; --surface:#111318; --surface2:#181c23; --border:#1e2330;
+  --accent:#00e5a0; --accent2:#ff6b35; --accent3:#4da6ff;
+  --text:#e8ecf5; --muted:#6b7591; --danger:#ff4757; --gold:#ffd700;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 800px 600px at 20% 10%,rgba(0,229,160,0.04) 0%,transparent 60%),radial-gradient(ellipse 600px 500px at 80% 80%,rgba(77,166,255,0.04) 0%,transparent 60%);pointer-events:none;z-index:0;}
+.container{max-width:900px;margin:0 auto;padding:0 20px 60px;position:relative;z-index:1;}
+
+header{padding:40px 0 24px;border-bottom:1px solid var(--border);margin-bottom:28px;}
+.logo{display:flex;align-items:baseline;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;letter-spacing:2px;color:var(--text);line-height:1;}
+.logo-badge{background:var(--accent);color:var(--bg);font-size:0.65rem;font-weight:600;letter-spacing:2px;padding:3px 8px;border-radius:3px;text-transform:uppercase;}
+.subtitle{color:var(--muted);font-size:0.85rem;}
+
+.folder-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:26px;}
+.btn-open{background:var(--accent);color:var(--bg);border:none;padding:12px 20px;border-radius:8px;font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1.5px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;gap:8px;}
+.btn-open:hover{opacity:0.85;}
+.folder-path{font-family:'DM Mono',monospace;font-size:0.78rem;color:var(--muted);}
+
+.unsupported{background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.25);border-radius:10px;padding:18px 20px;color:var(--text);font-size:0.9rem;line-height:1.5;}
+.unsupported strong{color:var(--danger);}
+
+.stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:24px;}
+.stat-tile{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center;}
+.stat-count{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;line-height:1;display:block;color:var(--text);}
+.stat-label{font-size:0.62rem;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-top:4px;display:block;}
+.stat-tile.f-vinto .stat-count{color:var(--accent);}
+.stat-tile.f-perso .stat-count{color:var(--danger);}
+.stat-tile.f-attesa .stat-count,.stat-tile.f-pareggio .stat-count{color:var(--gold);}
+
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+.filter-tab{background:var(--surface);border:1px solid var(--border);color:var(--muted);padding:8px 16px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:500;transition:all 0.2s;}
+.filter-tab:hover{border-color:var(--accent);color:var(--text);}
+.filter-tab.active{background:rgba(0,229,160,0.1);border-color:var(--accent);color:var(--accent);}
+
+.empty-state{color:var(--muted);font-size:0.9rem;padding:40px 0;text-align:center;}
+
+.card-list{display:flex;flex-direction:column;gap:10px;}
+.hcard{border-radius:10px;overflow:hidden;border:1px solid var(--border);background:var(--surface);cursor:pointer;transition:border-color 0.2s;}
+.hcard:hover{border-color:var(--accent3);}
+.hcard-top{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;gap:12px;flex-wrap:wrap;}
+.hcard-match{display:flex;flex-direction:column;gap:2px;min-width:0;}
+.hcard-teams{font-family:'Bebas Neue',sans-serif;font-size:1.15rem;letter-spacing:1px;color:var(--text);}
+.hcard-meta{font-size:0.72rem;color:var(--muted);font-family:'DM Mono',monospace;}
+.hcard-right{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.pronostico-tag{font-family:'Bebas Neue',sans-serif;font-size:0.95rem;color:var(--accent);letter-spacing:1px;}
+.confidence-mini{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);}
+
+.status-badge{font-size:0.65rem;font-weight:700;letter-spacing:1.5px;padding:4px 11px;border-radius:20px;text-transform:uppercase;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.status-in_attesa{background:rgba(255,215,0,0.12);color:var(--gold);border:1px solid rgba(255,215,0,0.3);}
+.status-vinto{background:rgba(0,229,160,0.12);color:var(--accent);border:1px solid rgba(0,229,160,0.3);}
+.status-perso{background:rgba(255,71,87,0.1);color:var(--danger);border:1px solid rgba(255,71,87,0.25);}
+.status-pareggio{background:rgba(255,215,0,0.1);color:var(--gold);border:1px solid rgba(255,215,0,0.2);}
+
+.hcard-detail{border-top:1px solid var(--border);padding:16px 18px 20px;display:none;}
+.hcard.expanded .hcard-detail{display:block;}
+.detail-section{margin-bottom:14px;}
+.detail-heading{font-size:0.62rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:6px;}
+.detail-heading.verifica{color:var(--accent3);}
+.detail-text{font-size:0.85rem;color:var(--text);line-height:1.5;}
+.detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px;}
+.detail-field{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;}
+.detail-field-label{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;}
+.detail-field-value{font-family:'DM Mono',monospace;font-size:0.85rem;color:var(--text);}
+.mercato-row{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:0.82rem;}
+.note-mancanti{background:rgba(255,107,53,0.08);border:1px solid rgba(255,107,53,0.25);border-radius:8px;padding:10px 12px;font-size:0.8rem;color:var(--text);}
+.file-error{background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.25);border-radius:8px;padding:10px 14px;font-size:0.8rem;color:var(--text);margin-bottom:8px;font-family:'DM Mono',monospace;}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="logo">
+      <span class="logo-text">PRONOSTICK.CODE</span>
+      <span class="logo-badge">Locale</span>
+    </div>
+    <div class="subtitle">Dashboard — pronostici generati e verificati via Claude Code (nessuna API a pagamento)</div>
+  </header>
+
+  <div id="unsupportedBox" class="unsupported" style="display:none;">
+    <strong>Browser non supportato.</strong> Questa dashboard usa la File System Access API per leggere
+    la cartella <code>pronostici/</code> direttamente dal disco, senza upload né server. Funziona solo su
+    Chrome o Edge (desktop). Apri questo file con uno di quei due browser.
+  </div>
+
+  <div id="mainArea" style="display:none;">
+    <div class="folder-bar">
+      <button class="btn-open" id="btnOpenFolder">📂 Apri cartella pronostici</button>
+      <span class="folder-path" id="folderPath"></span>
+    </div>
+
+    <div id="statsBar" class="stats-bar" style="display:none;"></div>
+    <div id="filterRow" class="filter-row" style="display:none;"></div>
+    <div id="fileErrors"></div>
+    <div id="cardList" class="card-list"></div>
+    <div id="emptyState" class="empty-state" style="display:none;"></div>
+  </div>
+
+</div>
+
+<script>
+const STATUS_LABELS = {
+  in_attesa: 'In Attesa', vinto: 'Vinto', perso: 'Perso', pareggio: 'Pareggio'
+};
+
+let allPronostici = []; // {data, fileName}
+let currentFilter = 'tutti';
+
+function escapeAttr(s){ return String(s); } // placeholder, non usato: si costruisce sempre via DOM/textContent
+
+function supportsFileSystemAccess(){
+  return typeof window.showDirectoryPicker === 'function';
+}
+
+function init(){
+  if (!supportsFileSystemAccess()){
+    document.getElementById('unsupportedBox').style.display = 'block';
+    return;
+  }
+  document.getElementById('mainArea').style.display = 'block';
+  document.getElementById('btnOpenFolder').addEventListener('click', openFolder);
+}
+
+async function openFolder(){
+  let dirHandle;
+  try {
+    dirHandle = await window.showDirectoryPicker();
+  } catch (e) {
+    return; // utente ha annullato la selezione, nessun errore da mostrare
+  }
+  document.getElementById('folderPath').textContent = 'Cartella: ' + dirHandle.name;
+
+  const loaded = [];
+  const errors = [];
+  for await (const [name, handle] of dirHandle.entries()) {
+    if (handle.kind !== 'file' || !name.toLowerCase().endsWith('.json')) continue;
+    try {
+      const file = await handle.getFile();
+      const text = await file.text();
+      const data = JSON.parse(text);
+      loaded.push({ data, fileName: name });
+    } catch (e) {
+      errors.push(name + ' — non leggibile o JSON non valido');
+    }
+  }
+
+  loaded.sort((a, b) => {
+    const da = a.data.matchDate || a.data.creato_il || '';
+    const db = b.data.matchDate || b.data.creato_il || '';
+    return db.localeCompare(da);
+  });
+
+  allPronostici = loaded;
+  renderFileErrors(errors);
+  renderStats();
+  renderFilters();
+  renderCards();
+}
+
+function renderFileErrors(errors){
+  const box = document.getElementById('fileErrors');
+  box.innerHTML = '';
+  errors.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = 'file-error';
+    div.textContent = '⚠️ ' + msg;
+    box.appendChild(div);
+  });
+}
+
+function renderStats(){
+  const bar = document.getElementById('statsBar');
+  if (allPronostici.length === 0){ bar.style.display = 'none'; return; }
+  bar.style.display = 'grid';
+  bar.innerHTML = '';
+
+  const counts = { totale: allPronostici.length, in_attesa: 0, vinto: 0, perso: 0, pareggio: 0 };
+  allPronostici.forEach(p => {
+    const s = p.data.status;
+    if (counts[s] !== undefined) counts[s]++;
+  });
+
+  const tiles = [
+    ['totale', 'Totale', ''],
+    ['in_attesa', 'In Attesa', 'f-attesa'],
+    ['vinto', 'Vinti', 'f-vinto'],
+    ['perso', 'Persi', 'f-perso'],
+    ['pareggio', 'Pareggio', 'f-pareggio']
+  ];
+  tiles.forEach(([key, label, cls]) => {
+    const tile = document.createElement('div');
+    tile.className = 'stat-tile ' + cls;
+    const count = document.createElement('span');
+    count.className = 'stat-count';
+    count.textContent = counts[key];
+    const lbl = document.createElement('span');
+    lbl.className = 'stat-label';
+    lbl.textContent = label;
+    tile.appendChild(count);
+    tile.appendChild(lbl);
+    bar.appendChild(tile);
+  });
+}
+
+function renderFilters(){
+  const row = document.getElementById('filterRow');
+  if (allPronostici.length === 0){ row.style.display = 'none'; return; }
+  row.style.display = 'flex';
+  row.innerHTML = '';
+
+  const options = [
+    ['tutti', 'Tutti'],
+    ['in_attesa', 'In Attesa'],
+    ['vinto', 'Vinti'],
+    ['perso', 'Persi'],
+    ['pareggio', 'Pareggio']
+  ];
+  options.forEach(([key, label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-tab' + (currentFilter === key ? ' active' : '');
+    btn.textContent = label;
+    btn.addEventListener('click', () => {
+      currentFilter = key;
+      renderFilters();
+      renderCards();
+    });
+    row.appendChild(btn);
+  });
+}
+
+function renderCards(){
+  const list = document.getElementById('cardList');
+  const empty = document.getElementById('emptyState');
+  list.innerHTML = '';
+
+  const filtered = currentFilter === 'tutti'
+    ? allPronostici
+    : allPronostici.filter(p => p.data.status === currentFilter);
+
+  if (allPronostici.length === 0){
+    empty.style.display = 'block';
+    empty.textContent = 'Nessun file .json trovato in questa cartella.';
+    return;
+  }
+  if (filtered.length === 0){
+    empty.style.display = 'block';
+    empty.textContent = 'Nessun pronostico con questo filtro.';
+    return;
+  }
+  empty.style.display = 'none';
+
+  filtered.forEach(entry => list.appendChild(buildCard(entry)));
+}
+
+function buildCard(entry){
+  const d = entry.data;
+  const card = document.createElement('div');
+  card.className = 'hcard';
+
+  const top = document.createElement('div');
+  top.className = 'hcard-top';
+
+  const matchBox = document.createElement('div');
+  matchBox.className = 'hcard-match';
+  const teams = document.createElement('div');
+  teams.className = 'hcard-teams';
+  teams.textContent = (d.team1 || '?') + ' vs ' + (d.team2 || '?');
+  const meta = document.createElement('div');
+  meta.className = 'hcard-meta';
+  meta.textContent = [d.sport, d.competition, d.matchDate].filter(Boolean).join(' · ');
+  matchBox.appendChild(teams);
+  matchBox.appendChild(meta);
+
+  const right = document.createElement('div');
+  right.className = 'hcard-right';
+
+  const pron = document.createElement('div');
+  pron.className = 'pronostico-tag';
+  pron.textContent = d.pronostico_principale || '—';
+  const conf = document.createElement('div');
+  conf.className = 'confidence-mini';
+  conf.textContent = (typeof d.confidenza === 'number') ? d.confidenza + '/100' : '';
+  const pronBox = document.createElement('div');
+  pronBox.style.textAlign = 'right';
+  pronBox.appendChild(pron);
+  pronBox.appendChild(conf);
+
+  const badge = document.createElement('span');
+  const statusKey = d.status || 'in_attesa';
+  badge.className = 'status-badge status-' + statusKey;
+  badge.textContent = STATUS_LABELS[statusKey] || statusKey;
+
+  right.appendChild(pronBox);
+  right.appendChild(badge);
+
+  top.appendChild(matchBox);
+  top.appendChild(right);
+  card.appendChild(top);
+
+  const detail = buildDetail(d, entry.fileName);
+  card.appendChild(detail);
+
+  top.addEventListener('click', () => {
+    card.classList.toggle('expanded');
+  });
+
+  return card;
+}
+
+function detailField(label, value){
+  const box = document.createElement('div');
+  box.className = 'detail-field';
+  const lbl = document.createElement('div');
+  lbl.className = 'detail-field-label';
+  lbl.textContent = label;
+  const val = document.createElement('div');
+  val.className = 'detail-field-value';
+  val.textContent = (value === null || value === undefined || value === '') ? '—' : value;
+  box.appendChild(lbl);
+  box.appendChild(val);
+  return box;
+}
+
+function detailSection(heading, text, extraClass){
+  const wrap = document.createElement('div');
+  wrap.className = 'detail-section';
+  const h = document.createElement('div');
+  h.className = 'detail-heading' + (extraClass ? ' ' + extraClass : '');
+  h.textContent = heading;
+  const p = document.createElement('div');
+  p.className = 'detail-text';
+  p.textContent = text || '—';
+  wrap.appendChild(h);
+  wrap.appendChild(p);
+  return wrap;
+}
+
+function buildDetail(d, fileName){
+  const wrap = document.createElement('div');
+  wrap.className = 'hcard-detail';
+
+  const grid = document.createElement('div');
+  grid.className = 'detail-grid';
+  grid.appendChild(detailField('Quota stimata', d.quota_stimata));
+  grid.appendChild(detailField('Rischio', d.rischio));
+  grid.appendChild(detailField('Prob. 1 / X / 2', [d.probabilita_1, d.probabilita_x, d.probabilita_2].map(v => v ?? '—').join(' / ')));
+  grid.appendChild(detailField('Value bet', d.value_bet_principale === true ? 'Sì' : (d.value_bet_principale === false ? 'No' : '—')));
+  wrap.appendChild(grid);
+
+  wrap.appendChild(detailSection('Descrizione pronostico', d.descrizione_pronostico));
+  wrap.appendChild(detailSection('Analisi forma', d.analisi_forma));
+  wrap.appendChild(detailSection('Analisi tattica', d.analisi_tattica));
+  wrap.appendChild(detailSection('Fattori chiave', d.fattori_chiave));
+  wrap.appendChild(detailSection('Consiglio aggiuntivo', d.consiglio_aggiuntivo));
+
+  if (d.mercati && typeof d.mercati === 'object' && Object.keys(d.mercati).length){
+    const mHeading = document.createElement('div');
+    mHeading.className = 'detail-heading';
+    mHeading.textContent = 'Mercati';
+    wrap.appendChild(mHeading);
+    Object.entries(d.mercati).forEach(([key, m]) => {
+      const row = document.createElement('div');
+      row.className = 'mercato-row';
+      const title = document.createElement('div');
+      title.style.color = 'var(--text)';
+      title.style.fontWeight = '600';
+      title.textContent = key.replace(/_/g, ' ');
+      const line = document.createElement('div');
+      line.style.color = 'var(--muted)';
+      line.style.marginTop = '3px';
+      const parts = [];
+      if (m.consiglio) parts.push('Consiglio: ' + m.consiglio);
+      if (typeof m.probabilita === 'number') parts.push('Prob: ' + m.probabilita + '%');
+      if (m.quota_bookmaker) parts.push('Quota: ' + m.quota_bookmaker);
+      if (m.value_bet) parts.push('VALUE BET');
+      line.textContent = parts.join(' · ');
+      row.appendChild(title);
+      row.appendChild(line);
+      if (m.note){
+        const note = document.createElement('div');
+        note.style.marginTop = '3px';
+        note.style.fontSize = '0.78rem';
+        note.textContent = m.note;
+        row.appendChild(note);
+      }
+      wrap.appendChild(row);
+    });
+  }
+
+  if (d.note_mancanti){
+    const noteWrap = document.createElement('div');
+    noteWrap.className = 'detail-section';
+    const h = document.createElement('div');
+    h.className = 'detail-heading';
+    h.style.color = 'var(--accent2)';
+    h.textContent = 'Note mancanti';
+    const note = document.createElement('div');
+    note.className = 'note-mancanti';
+    note.textContent = d.note_mancanti;
+    noteWrap.appendChild(h);
+    noteWrap.appendChild(note);
+    wrap.appendChild(noteWrap);
+  }
+
+  if (d.verifica){
+    const v = d.verifica;
+    const vHeading = document.createElement('div');
+    vHeading.className = 'detail-heading verifica';
+    vHeading.textContent = 'Verifica';
+    wrap.appendChild(vHeading);
+
+    const vGrid = document.createElement('div');
+    vGrid.className = 'detail-grid';
+    vGrid.appendChild(detailField('Risultato reale', v.punteggio_reale));
+    vGrid.appendChild(detailField('Vincitore reale', v.vincitore_reale));
+    vGrid.appendChild(detailField('Esito scommessa', v.esito_scommessa));
+    vGrid.appendChild(detailField('Accuratezza', v.accuratezza));
+    wrap.appendChild(vGrid);
+
+    wrap.appendChild(detailSection('Cosa ha indovinato', v.cosa_ha_indovinato));
+    wrap.appendChild(detailSection('Cosa ha sbagliato', v.cosa_ha_sbagliato));
+    wrap.appendChild(detailSection('Nota apprendimento', v.nota_apprendimento));
+  }
+
+  const fileTag = document.createElement('div');
+  fileTag.style.marginTop = '10px';
+  fileTag.style.fontSize = '0.68rem';
+  fileTag.style.color = 'var(--muted)';
+  fileTag.style.fontFamily = "'DM Mono',monospace";
+  fileTag.textContent = fileName;
+  wrap.appendChild(fileTag);
+
+  return wrap;
+}
+
+init();
+</script>
+</body>
+</html>
