@@ -8,8 +8,8 @@
 
 | Campo | Valore |
 |-------|--------|
-| **Ultimo aggiornamento** | 16/07/2026 |
-| **Ultima sessione** | Controllo costi/ragionamento del punto di Verifica Risultato in Storico — trovato e corretto un bug reale di escaping mancante (XSS) in `verificaRisultato()`, aggiunta stima di costo prima assente |
+| **Ultimo aggiornamento** | 26/07/2026 |
+| **Ultima sessione** | Avviato progetto satellite **Pronostick.Code** (motore locale via Claude Code invece di API) — Sessione 1: struttura cartelle + skill `analizza-locale` |
 | **Deploy** | https://pronostick.netlify.app/ |
 | **GitHub** | Mondor89/Pronostick |
 | **Tier Anthropic** | Tier 1 (modello consigliato: Haiku) |
@@ -17,15 +17,9 @@
 ---
 
 ## Focus Attuale
-App funzionante e deployata, nessun bug noto aperto. Sessione del 15/07/2026 (mattina): analisi (non implementazione) del metodo di generazione pronostici e del sistema di apprendimento da utilizzo (`buildPrompt`/`buildMemory`/verifica). Emersa una roadmap a 4 passi progressivi verso il Tag Pattern per AI Memory (vedi Task Aperte), attualmente bloccata sul primo gradino per mancanza di dati (2 pronostici verificati, servono almeno 5-6 per il primo passo).
+App funzionante e deployata, nessun bug noto aperto. Roadmap Memoria AI (vedi Task Aperte) ancora ferma al primo gradino per mancanza di dati (pochi pronostici verificati). Dettaglio delle sessioni 15-16/07/2026 (ricerca calendario, fix escaping Verifica Risultato) in Log Sessioni/Archivio Log sotto.
 
-Sessione del 15/07/2026 (pomeriggio): spostata la ricerca calendario (query web ampie, poco valore analitico) fuori dal budget API a pagamento di Pronostick, su un Project claude.ai dedicato che usa l'uso incluso nel piano Pro. Implementato il lato Pronostick: import calendario da incolla nella tab Calendario, con validazione esplicita riga per riga.
-
-Sessione del 15/07/2026 (sera): consolidata la ricerca calendario dentro Claude Code (stesso piano Pro di Fabio, nessun costo aggiuntivo) invece del Project claude.ai separato — creata skill `.claude/skills/cerca-calendario/SKILL.md`, output su file locale `calendario/export.json` (gitignored). Aggiunto anche upload file diretto nella tab Calendario (accanto al copia-incolla), stessa validazione già esistente riusata. Primo test end-to-end con ricerca reale (Tennis ATP): trovati e corretti un nome giocatore inventato e una data sbagliata (letta da un riepilogo di ricerca aggregato) — nessuno dei due era intercettabile dalla sola validazione di formato. Patch applicate a `SKILL.md` (2) e `CLAUDE.md` (1, vedi sotto). Proposta di Fabio di un comando `!ricerca` per isolare le ricerche dalla chat di coding — discussa, in sospeso: prima verificare se la skill è già invocabile nativamente con `/cerca-calendario` in una sessione nuova, prima di costruire una convenzione ad hoc.
-
-Sessione del 16/07/2026 (pomeriggio): confermato che `/cerca-calendario` è invocabile nativamente in una sessione Claude Code separata — task di verifica chiusa, nessun bisogno del fallback `!ricerca`. Fabio ha eseguito la prima ricerca reale (2 partite tennis trovate, calcio/basket correttamente vuoti per pausa estiva). Rivista la trascrizione di quella sessione con gli strumenti di gestione sessione (`list_sessions`/`list_events`) invece di farsela incollare: applicati bene i punti 5-6 della skill (niente dati inventati), e la sessione ha trovato/corretto da sola un bug prima di consegnare (wrapper `{"ricerche":[...]}` incompatibile col parser reale, scoperto verificando contro `index.html` come da procedura). Applicata patch a `SKILL.md` (v1.2): schema chiarito per il caso multi-sport in un'unica richiesta.
-
-Sessione del 16/07/2026 (sera): Fabio ha chiesto di controllare costi e "ragionamento" nel punto di Verifica Risultato in Storico, e se allineato con le modifiche recenti. Analisi diretta del codice (`verificaRisultato()`, `buildMemory()`, `buildPrompt()`, pannello costi): il mapping campi tra schema JSON di analisi ed eval prompt è corretto, nessun disallineamento con le modifiche recenti (calendario, flusso separato). Trovato invece un bug reale non legato alle modifiche recenti: `verificaRisultato()` scriveva il pannello senza `escapeHtml()` su testo AI generato da un risultato di web search — non coperto dall'invariante #4, a differenza di `buildCompactCardDOM()` che ridisegna lo stesso pannello dai dati salvati correttamente escapato. Corretto e verificato iniettando payload XSS in tutti i campi (0 esecuzioni). Aggiunta anche una stima di costo (`~$0.10`) accanto al bottone, prima assente (2 chiamate API reali senza indicatore). REGISTRA eseguito: Fase 1 PATCH — 3 gap trovati e applicati (script di controllo pattern, procedura di verifica manuale dell'invariante #4, estensione Principio Prodotto #3).
+**Novità 26/07/2026** — avviato un progetto satellite separato, **Pronostick.Code** (`Pronostick.Code/`): motore di analisi/verifica pronostici via Claude Code (WebSearch nativo) invece che API a pagamento, isolato dal Pronostick reale (nessun collegamento a `index.html`/localStorage/Firestore), zero costo. Nasce per affinare il ragionamento di analisi senza spendere credito ad ogni iterazione — vedi sezione dedicata in `CLAUDE.md` per confini e motivazione. Sessione 1 (fondamenta) completata; dashboard e guida restano da fare (vedi Task Aperte).
 
 ---
 
@@ -40,6 +34,11 @@ Sessione del 16/07/2026 (sera): Fabio ha chiesto di controllare costi e "ragiona
 ---
 
 ## Task Aperte
+
+### Pronostick.Code — roadmap (avviato 26/07/2026)
+- [ ] Primo test end-to-end reale della skill `analizza-locale` (analisi + verifica su una partita vera) — solo le fondamenta sono state costruite, mai ancora eseguita
+- [ ] Sessione 2 — dashboard (`Pronostick.Code/dashboard.html`, File System Access API, stesso stile/CSS dell'app originale)
+- [ ] Sessione 3 — Guida/FAQ dedicata al processo Claude Code (`Pronostick.Code/istruzioni.html`)
 
 ### Priorità Alta — roadmap Memoria AI (analisi 15/07/2026, in ordine di esecuzione)
 - [ ] Spot-check affidabilità della verifica automatica (confrontare a mano 5-6 `verifica.nota_apprendimento` col risultato reale) — appena si arriva a 5-6 pronostici verificati. Prerequisito: oggi (15/07/2026) la pipeline di verifica (auto-giudizio AI su web search) non è mai stata validata contro un riscontro umano
@@ -67,6 +66,7 @@ Sessione del 16/07/2026 (sera): Fabio ha chiesto di controllare costi e "ragiona
 - [x] Ricerca calendario consolidata dentro Claude Code: skill `.claude/skills/cerca-calendario/SKILL.md` + output su file locale `calendario/export.json` + upload file diretto in tab Calendario (riusa validazione esistente) — testato end-to-end con ricerca reale, 2 bug trovati e corretti (15/07/2026)
 - [x] Confermato che `/cerca-calendario` è invocabile nativamente in una sessione Claude Code separata — prima ricerca reale eseguita con successo, patch v1.2 a `SKILL.md` per il caso multi-sport (16/07/2026)
 - [x] Corretto escaping mancante in `verificaRisultato()` (XSS via testo AI generato da web search, non coperto dall'invariante #4) + aggiunta stima di costo `~$0.10` prima assente sul bottone Verifica Risultato; nuovo controllo euristico [5] in `check-known-bug-patterns.sh` (16/07/2026)
+- [x] Pronostick.Code — Sessione 1 (fondamenta): struttura cartelle (`Pronostick.Code/`, `pronostici/`, `_inbox/`, entrambe gitignored) + skill `.claude/skills/analizza-locale/SKILL.md` (analisi e verifica via WebSearch nativo, stesso schema JSON del Pronostick reale, isolato e a costo zero) (26/07/2026)
 
 ---
 
@@ -86,6 +86,8 @@ Nessun bug noto aperto al momento (chiusi tutti in sessione del 14/07/2026 — v
 | 15/07/2026 | Ricerca calendario spostata dal Project claude.ai esterno a una skill Claude Code locale (`.claude/skills/cerca-calendario/`), invece di mantenere i due canali paralleli | Fabio usa Claude Code sul piano Pro (stesso di claude.ai) — nessuna differenza di costo, ma un passaggio in meno e la possibilità per Claude Code di validare l'output contro il parser reale invece che contro una copia di documentazione. `pronostick_calendario_project.md` resta come alternativa, non eliminato |
 | 16/07/2026 | Confermato che `/cerca-calendario` è invocabile nativamente in una sessione Claude Code nuova, senza bisogno del fallback `!ricerca` proposto da Fabio il 15/07 per isolare le ricerche dalla chat di coding | Verificato con un primo uso reale: la skill è stata trovata e lanciata correttamente dalla sessione dedicata, chiude la task aperta di verifica |
 | 16/07/2026 | Applicate 3 patch da un controllo diretto del punto di Verifica Risultato: nuovo controllo [5] in `check-known-bug-patterns.sh` (blocchi `innerHTML=` per concatenazione senza `escapeHtml()`), nota in `CLAUDE.md` sul grep manuale `.innerHTML` per l'invariante #4 (path di rendering duplicati possono divergere), estensione Principio Prodotto #3 a ogni bottone che chiama l'API | Il bug reale trovato (escaping mancante in `verificaRisultato()`) non era intercettabile né dallo script esistente (solo pattern template-literal) né dal principio costi (limitato al pannello di Analizza) — gap strutturali, non solo un fix puntuale |
+| 26/07/2026 | Esplorata un'estensione ibrida di Pronostick (stesso storico/Statistiche/AI Memory condivisi tra due motori, API + Claude Code) e scartata per il rischio di una decisione architetturale difficile da disfare sul prodotto reale. Avviato invece un progetto satellite separato **Pronostick.Code**: stessa qualità di analisi, motore Claude Code (WebSearch nativo) invece di API, dati isolati su file locali, verifica anch'essa via Claude Code (non API) per un ciclo di lezioni con un unico giudice coerente. Travaso di eventuali miglioramenti verso il Pronostick reale sempre manuale, mai automatico | Fabio vuole usare Claude Code per affinare il ragionamento di analisi a costo zero (piano Pro) prima di spendere credito API per testare iterazioni — stesso pattern già validato sul progetto gemello Bracco (motore Claude Code + dati su file locali, nessuna webapp con chiamate a pagamento) |
+| 26/07/2026 | Applicata patch a `CLAUDE.md` (Gestione modello): obbligo di chiedere il modello/impegno attuale prima di proporre un'escalation, e valutazione del trigger anche in fase di discussione architetturale, non solo prima del codice | Trovato un caso reale nella sessione: proposta di escalation a modello intermedio quando Fabio aveva già quel livello impostato — stesso gap già risolto nel `CLAUDE.md` del progetto gemello Bracco |
 
 ---
 
@@ -105,14 +107,15 @@ Nessun bug noto aperto al momento (chiusi tutti in sessione del 14/07/2026 — v
 
 | Data | Attività |
 |------|----------|
-| 16/07/2026 | Fabio ha eseguito la prima ricerca calendario reale con `/cerca-calendario` in una sessione Claude Code separata — confermata l'invocazione nativa, chiusa la task di verifica, nessun bisogno di `!ricerca`. Trovate 2 partite tennis (Pellegrino-Rublev, Arnaldi-Dzumhur), calcio e basket correttamente vuoti (pausa estiva/dati non confermati, nessun dato forzato). Rivista la trascrizione della sessione con gli strumenti di gestione sessione (`list_sessions`/`list_events`) invece di farsela incollare da Fabio: applicati bene i punti 5-6 della skill (niente fabbricazioni), e la sessione ha trovato/corretto da sola un bug prima di consegnare — un wrapper `{"ricerche":[...]}` incompatibile col parser reale (`importaCalendarioIncollato()` si aspetta `partite` a livello radice), scoperto verificando contro `index.html` come richiesto dalla procedura. Applicata patch a `SKILL.md` (v1.2): schema output chiarito per il caso di più sport in un'unica richiesta. REGISTRA eseguito: Fase 1 PATCH — nessun gap per CLAUDE.md, la patch riguardava solo SKILL.md. Compresse in Archivio Log le voci più vecchie (14/07/2026) di Decisioni Prese e Log Sessioni per restare sotto le 150 righe. |
-| 16/07/2026 | Fabio ha chiesto di controllare costi e "ragionamento" nel punto di Verifica Risultato in Storico, e se allineato con le modifiche recenti. Letti `verificaRisultato()`, `buildMemory()`, `buildPrompt()`, mapping campi al salvataggio: nessun disallineamento trovato lì. Trovato invece un bug di escaping mancante (XSS) in `verificaRisultato()`, non coperto dall'invariante #4 — corretto e verificato con payload XSS in tutti i campi (0 esecuzioni), più una stima di costo `~$0.10` prima assente sul bottone. Testato in anteprima locale (server statico, dati di test in localStorage). REGISTRA eseguito: Fase 1 PATCH — 3 gap trovati e applicati (vedi Decisioni Prese, CLAUDE.md, `check-known-bug-patterns.sh`). Compresse in Archivio Log le 3 voci di sessione del 15/07/2026 per restare sotto le 150 righe. |
+| 26/07/2026 | Fabio ha chiesto di controllare il progetto gemello Bracco (motore Claude Code invece di API, dati su file locali) e valutare se replicare il pattern in Pronostick. Discussione lunga, senza codice fino alla decisione finale: esplorata prima un'estensione ibrida dentro `index.html` (stesso storico/Statistiche/AI Memory per due motori), scartata per rischio architetturale sul prodotto reale già in uso; scelto invece un progetto satellite separato e reversibile, **Pronostick.Code**. Decisioni chiave: stessa qualità di analisi dell'API, verifica anche quella via Claude Code (non API, per un giudizio coerente), dati/memoria isolati su file locali, nessun confronto automatico tra i due motori nella skill, travaso di miglioramenti verso il Pronostick reale sempre manuale. Costruita la Sessione 1 (fondamenta): `Pronostick.Code/` (`LEGGIMI.md`, `pronostici/`, `_inbox/`, ultime due gitignored) + skill `.claude/skills/analizza-locale/SKILL.md` (schema analisi/verifica allineato a `buildPrompt()`/`verificaRisultato()`/`buildMemory()` di `index.html`). REGISTRA eseguito: Fase 1 PATCH applicata a `CLAUDE.md` (Gestione modello — chiedere sempre il modello/impegno attuale prima di proporre un cambio, trigger valido anche in fase di discussione), trovata perché in questa stessa sessione era scattato l'errore che la patch previene. Non ancora testata dal vivo la skill (prima analisi/verifica reale resta in Task Aperte). Compresse in Archivio Log le 2 voci di sessione del 16/07/2026. |
 
 ## Archivio Log
-> Sessioni e decisioni più vecchie, spostate qui il 14/07/2026 per restare sotto le 150 righe — dettaglio ridotto, il codice/git history restano la fonte primaria per i dettagli tecnici.
+> Sessioni e decisioni più vecchie, spostate qui il 14-26/07/2026 per restare sotto le 150 righe — dettaglio ridotto, il codice/git history restano la fonte primaria per i dettagli tecnici.
 
 ### Sessioni precedenti
 - **25/04/2026** — Sviluppo iniziale: Cerca Quote, dropdown bookmaker, pannello quote collassabile, pulsante TUTTI i mercati.
+- **16/07/2026** — Prima ricerca calendario reale con `/cerca-calendario` in sessione separata: invocazione nativa confermata, 2 partite tennis trovate, trovato/corretto un bug (wrapper incompatibile col parser) prima di consegnare. Patch `SKILL.md` v1.2 (schema multi-sport).
+- **16/07/2026** — Controllo costi/ragionamento del punto Verifica Risultato: nessun disallineamento nel mapping campi, ma trovato e corretto un bug reale di escaping mancante (XSS) in `verificaRisultato()`, non coperto dall'invariante #4. Aggiunta stima di costo `~$0.10` prima assente sul bottone.
 - **15/07/2026** — Analisi (nessun codice toccato) del metodo AI pronostici/apprendimento: statistiche aggregate mai riusate nel prompt, verifica limitata al solo pronostico principale, pipeline di auto-verifica mai validata contro riscontro umano. Definita roadmap a 4 step gated da soglie dati verso Tag Pattern.
 - **15/07/2026** — Import Calendario da incolla (tab Calendario) + `pronostick_calendario_project.md` per Project claude.ai esterno dedicato alla ricerca partite, fuori dal budget API a pagamento.
 - **15/07/2026** — Ricerca calendario consolidata dentro Claude Code: skill `.claude/skills/cerca-calendario/SKILL.md` + upload file diretto in tab Calendario. Primo test reale trovò 2 errori (nome giocatore inventato, data sbagliata) non intercettabili dalla sola validazione di formato.
@@ -132,13 +135,7 @@ Nessun bug noto aperto al momento (chiusi tutti in sessione del 14/07/2026 — v
 - **15/07/2026** — Prima del Tag Pattern per AI Memory, roadmap a 4 step progressivi (spot-check verifica → verifica per-mercato → statistiche di calibrazione aggregate → Tag Pattern), gated da soglie di pronostici verificati — vedi Task Aperte.
 
 ### Bug risolti (code review 14/07/2026 — dettaglio completo nel commit)
-- **A1** bottoni Ricalcola/Elimina ricollegati a `ricalcola()`/`deleteEntry()`; corretto bug dormiente in `deleteEntry()` (`insertBefore` su nodo non figlio diretto).
-- **A2** dettaglio pronostico mai visibile, mancava la classe CSS `open`.
-- **A3** escape `\'` non valido in 2 `onkeydown`, rompeva l'handler Enter.
-- **A4** `renderChips()` riscritta con DOM.
-- **A5** `clearCalendario()` ora sincronizza lo svuotamento su Firebase.
-- **B1-B5** escaping mancante aggiunto in 7 funzioni di rendering (invariante #4).
-- **C2** pannello "Verifica Risultato" si richiudeva subito dopo il refresh, ora riapre la card.
+A1 (bottoni Ricalcola/Elimina + bug dormiente `deleteEntry()`), A2 (dettaglio pronostico mai visibile), A3 (Enter rotto), A4 (`renderChips()` con DOM), A5 (svuota calendario sincronizzato Firebase), B1-B5 (escaping mancante, invariante #4), C2 (pannello Verifica si richiudeva).
 
 ---
 

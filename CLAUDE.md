@@ -126,6 +126,8 @@ Se **a sessione già avviata** Fabio chiede di rileggere questo file (non il pri
 
 > Claude non può cambiare modello da solo nella conversazione principale (`/model` lo esegue solo Fabio). Esiste anche lo slider **"Impegno"** (6 livelli), indipendente dal modello.
 
+**Prima di proporre**, Claude deve chiedere a Fabio quale modello/impegno ha attualmente impostato nel client — non deve assumerlo dall'auto-identificazione di sistema, che può non corrispondere all'impostazione reale (trovato 26/07/2026: proposta di escalation ridondante perché Fabio aveva già il livello suggerito). Il trigger di valutazione scatta anche PRIMA di iniziare a discutere/valutare opzioni architetturali in chat, non solo prima di scrivere codice — se la discussione fa presagire una decisione difficile da disfare, il check va fatto al primo messaggio in cui si comincia a proporre opzioni.
+
 **Quando proporre il modello intermedio:** bug tecnico dopo 2 tentativi falliti sullo stesso sintomo senza progressi; nuova funzionalità che tocca 3+ punti del codice.
 
 **Quando proporre il modello più potente:** revisione completa del codice, decisione architetturale difficile da disfare (es. cambio provider auth/storage), audit di sicurezza esplicito richiesto da Fabio.
@@ -225,12 +227,35 @@ Pronostick/
 ├── scripts/check-known-bug-patterns.sh  ← controllo euristico pre-commit dei pattern-trappola noti
 ├── .claude/launch.json               ← config server locale di anteprima (Python http.server, porta 8080)
 ├── .claude/skills/cerca-calendario/SKILL.md  ← skill Claude Code per ricerca calendario (stesso piano Pro, sostituisce il Project esterno)
+├── .claude/skills/analizza-locale/SKILL.md   ← skill Claude Code per Pronostick.Code (analisi/verifica pronostici via WebSearch nativo, zero costo)
 ├── calendario/                       ← output ricerca calendario (JSON), gitignored, temporaneo
+├── Pronostick.Code/                  ← laboratorio locale separato, motore Claude Code invece di API — vedi sezione dedicata sotto
+│   ├── LEGGIMI.md
+│   ├── pronostici/                   ← gitignored
+│   └── _inbox/                       ← gitignored, riservata alla futura dashboard
 ├── .gitignore
 └── .gitattributes                    ← forza LF sugli .sh (evita rotture da autocrlf Windows)
 ```
 
 Se `index.html` dovesse superare le ~6000 righe o servissero più pagine distinte, valutare lo split in una struttura multi-file (vedi `CLAUDE_APP_TEMPLATE.md`).
+
+---
+
+## Pronostick.Code — laboratorio locale [aggiunto 26/07/2026]
+
+**Cosa è:** un secondo "motore" per Pronostick, isolato in `Pronostick.Code/` — genera e verifica pronostici usando le capacità native di Claude Code (WebSearch + ragionamento) invece dell'API Anthropic a pagamento, a costo zero (incluso nel piano Pro di Fabio). Nasce per affinare il ragionamento di analisi senza spendere credito ad ogni iterazione, prima di eventualmente portare un miglioramento nel Pronostick reale.
+
+**Perché una cartella separata e non un'estensione di `index.html`:** il Pronostick reale è già un prodotto valido in uso. Un'architettura ibrida (stesso storico/statistiche condivisi tra due motori) sarebbe stata una decisione difficile da disfare — isolare tutto in una sandbox separata rende l'esperimento reversibile, senza nessun rischio per dati/architettura del prodotto reale (vedi Registro Decisioni in `pronostick_stato.md`, 26/07/2026).
+
+**Confini netti:**
+- Nessun collegamento a `index.html`, localStorage o Firestore — dati e "memoria" (lezioni apprese) vivono solo in `Pronostick.Code/pronostici/` (gitignored)
+- Nessuna chiamata API Anthropic — zero voci nel pannello costi, zero credito consumato
+- Analisi **e** verifica sono entrambe compito di Claude Code (WebSearch nativo) — non solo l'analisi, per avere un ciclo di "lezioni apprese" coerente con un unico metro di giudizio
+- Un eventuale miglioramento di ragionamento scoperto qui va portato nel Pronostick reale (`buildPrompt()`) sempre a mano — mai un sync automatico tra le due basi di codice
+- Nessun confronto automatico tra i due motori integrato nella skill — un eventuale confronto side-by-side resta una scelta manuale e occasionale di Fabio
+- Skill che lo governa: `.claude/skills/analizza-locale/SKILL.md`. Roadmap a fasi (motore → dashboard → guida): vedi `Pronostick.Code/LEGGIMI.md` e Task Aperte in `pronostick_stato.md`
+
+**Governance:** Pronostick.Code non ha un proprio ciclo RIEPILOGO/REGISTRA separato — resta sotto lo stesso `CLAUDE.md`/REGISTRA di Pronostick, essendo una sotto-cartella dello stesso repository. Se in futuro crescesse fino a giustificarlo, valutare una governance dedicata come per il progetto gemello Bracco.
 
 ---
 
