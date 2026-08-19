@@ -124,7 +124,9 @@ Se **a sessione già avviata** Fabio chiede di rileggere questo file (non il pri
 
 ## Gestione modello — quando suggerire un cambio [UNIVERSALE — SEMPRE ATTIVA]
 
-> Claude non può cambiare modello da solo nella conversazione principale (`/model` lo esegue solo Fabio). Esiste anche lo slider **"Impegno"** (6 livelli), indipendente dal modello.
+> Claude non può cambiare modello da solo nella conversazione principale (`/model` lo esegue solo Fabio). Esiste anche lo slider **"Impegno"**, indipendente dal modello.
+>
+> **Non elencare qui i nomi dei livelli né i modelli disponibili** — appartengono all'interfaccia del client e cambiano senza preavviso: un elenco scritto in un file di progetto invecchia in silenzio e produce proposte sbagliate. Chiedere sempre a Fabio cosa ha impostato adesso.
 
 **Prima di proporre**, Claude deve chiedere a Fabio quale modello/impegno ha attualmente impostato nel client — non deve assumerlo dall'auto-identificazione di sistema, che può non corrispondere all'impostazione reale (trovato 26/07/2026: proposta di escalation ridondante perché Fabio aveva già il livello suggerito). Il trigger di valutazione scatta anche PRIMA di iniziare a discutere/valutare opzioni architetturali in chat, non solo prima di scrivere codice — se la discussione fa presagire una decisione difficile da disfare, il check va fatto al primo messaggio in cui si comincia a proporre opzioni.
 
@@ -133,6 +135,8 @@ Se **a sessione già avviata** Fabio chiede di rileggere questo file (non il pri
 **Quando proporre il modello più potente:** revisione completa del codice, decisione architetturale difficile da disfare (es. cambio provider auth/storage), audit di sicurezza esplicito richiesto da Fabio.
 
 **Quando restare sul modello base:** fix singolo e localizzato, test + correzioni, tweak UI/testo, refactor piccolo.
+
+**Quando scendere (de-escalation):** dopo un'escalation il costo è concentrato nella fase di analisi; cambiare modello non fa perdere il contesto già emerso in chat, quindi appena il lavoro pesante è concluso e resta solo da applicare passi già definiti, proporre la discesa. Restare in alto — dicendolo — se un fix fallisce due volte sullo stesso sintomo senza progressi. Mai risalire in silenzio.
 
 **Come proporlo:** motivazione con (1) perché serve più potenza, (2) quale livello e perché, (3) rischio restando sul base. Poi `/model` manuale. Non bloccare il lavoro in attesa — proporre e continuare, salvo blocco reale.
 
@@ -159,6 +163,7 @@ Se **a sessione già avviata** Fabio chiede di rileggere questo file (non il pri
 - **Prima di scrivere codice nuovo, verificare cosa il sistema esistente già permette.** Una richiesta "vorrei che X potesse fare anche Y" spesso non richiede una feature nuova.
 - **Un fallback silenzioso che crea dati "vuoti" è più pericoloso di un errore esplicito.** Meglio fallire in modo visibile che generare un placeholder che sembra valido ma non lo è.
 - **Un bug che sembra "strano" o "impossibile" nasce spesso da precedenza degli operatori, non da logica sbagliata.** Vedi "Regole JavaScript/Web" più sotto — Pronostick aveva 4 bug reali di questo tipo (corretti il 14/07/2026).
+- **Se un passaggio di verifica non è eseguibile dallo strumento di automazione, non forzarlo e non aggirarlo: dichiara il limite e chiedi a Fabio di eseguire lui l'ultimo passaggio.** Quattro cause, stessa soluzione: (a) un secret reale in un campo UI — la policy ne blocca l'inserimento, ed è corretto; (b) un dialogo nativo dell'OS (file picker, File System Access API) — limite dello strumento; (c) un comando shell che fallisce per permessi/sessione/credenziali mentre il codice sembra corretto — farlo rieseguire a Fabio dal suo terminale **prima** di concludere che è rotto; (d) un'anteprima che sembra funzionare e invece no — pagina resa come snapshot statico, CSS/iframe/JS non caricati, **nessun errore in console o network**: è il caso peggiore, perché il tool non segnala niente. In tutti i casi: verificare la logica raggiungibile con uno script o `curl`, dichiarare il limite, e non dichiarare mai "testato" ciò che non lo è.
 - **Quando si ripristina un handler o percorso di codice prima irraggiungibile (bottone rotto, funzione inesistente, condizione sempre falsa), testare l'azione fino in fondo con un click reale — non fermarsi a verificare che la funzione richiamata esista.** Codice a valle mai eseguito in produzione può nascondere bug dormienti scoperti solo ora (es. 14/07/2026: riabilitato il bottone Elimina nello Storico, la funzione esisteva ma un `insertBefore` al suo interno falliva su un nodo non figlio diretto — mai emerso prima perché il bottone non era mai stato cliccabile).
 
 ---
