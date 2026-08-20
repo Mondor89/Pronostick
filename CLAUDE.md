@@ -55,7 +55,9 @@ stato attuale, ultima decisione presa, task di questa sessione. Poi attendi.
 
 **Fase 1 — analisi PATCH.** Prima di toccare qualunque file, esegui l'analisi del comando PATCH (vedi sotto) sull'intera sessione. Se emerge almeno una `⚠️ PATCH SUGGERITA`, presentala e attendi la decisione di Fabio (applicare, modificare, scartare) prima di continuare. Se non emerge nulla di non banale, dillo esplicitamente in una riga e passa subito alla Fase 2 senza bloccare la sessione per una formalità.
 
-Se una patch approvata è marcata `AMBITO: da portare nel template`, chiedi conferma a Fabio e — se confermato — deposita un `.md` in `Template Claude\patch\_inbox\` (schema nel `LEGGIMI.md` di quella cartella). Non modificare mai un template direttamente: il travaso si fa in una sessione dedicata su Template Claude.
+Se una patch approvata è marcata `AMBITO: da portare nel template`, chiedi conferma a Fabio e — se confermato — deposita un `.md` in
+`C:\Users\fabio\Desktop\Download Desktop\XProgetti\1-Aiuto Cloude\Template Claude\patch\_inbox\`
+(schema nel `LEGGIMI.md` di quella cartella). Non modificare mai un template direttamente: il travaso si fa in una sessione dedicata su Template Claude.
 
 **Fase 2 — REGISTRA vero e proprio.** Solo dopo la decisione della Fase 1 (ed eventuali modifiche a `CLAUDE.md` già applicate): leggi tutti i file `.md` e aggiornali con quanto emerso nella sessione, inclusa la decisione appena presa sulla PATCH. Indica cosa è cambiato in ogni file. Poi fai `git add . && git commit` in un unico commit che comprenda anche l'eventuale modifica a `CLAUDE.md` (chiedi conferma prima del push, salvo diversa indicazione di Fabio).
 
