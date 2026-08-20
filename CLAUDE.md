@@ -55,6 +55,8 @@ stato attuale, ultima decisione presa, task di questa sessione. Poi attendi.
 
 **Fase 1 — analisi PATCH.** Prima di toccare qualunque file, esegui l'analisi del comando PATCH (vedi sotto) sull'intera sessione. Se emerge almeno una `⚠️ PATCH SUGGERITA`, presentala e attendi la decisione di Fabio (applicare, modificare, scartare) prima di continuare. Se non emerge nulla di non banale, dillo esplicitamente in una riga e passa subito alla Fase 2 senza bloccare la sessione per una formalità.
 
+Se una patch approvata è marcata `AMBITO: da portare nel template`, chiedi conferma a Fabio e — se confermato — deposita un `.md` in `Template Claude\patch\_inbox\` (schema nel `LEGGIMI.md` di quella cartella). Non modificare mai un template direttamente: il travaso si fa in una sessione dedicata su Template Claude.
+
 **Fase 2 — REGISTRA vero e proprio.** Solo dopo la decisione della Fase 1 (ed eventuali modifiche a `CLAUDE.md` già applicate): leggi tutti i file `.md` e aggiornali con quanto emerso nella sessione, inclusa la decisione appena presa sulla PATCH. Indica cosa è cambiato in ogni file. Poi fai `git add . && git commit` in un unico commit che comprenda anche l'eventuale modifica a `CLAUDE.md` (chiedi conferma prima del push, salvo diversa indicazione di Fabio).
 
 **Checklist obbligatoria REGISTRA (Fase 2) — rispondere sì/no a ogni voce, aggiornare se sì:**
@@ -85,8 +87,10 @@ Poi attendi conferma prima di procedere con il codice.
 SEZIONE:  [sezione di CLAUDE.md / "nuova sezione"]
 PROBLEMA: [cosa mancava o era inefficiente]
 MODIFICA: [testo esatto da aggiungere/sostituire]
+AMBITO:   [solo questo progetto / da portare nel template]
 PRIORITÀ: [alta / media / bassa]
 ```
+`AMBITO` non è una formalità: marcare `da portare nel template` quando la lezione non dipende dallo stack/dominio di Pronostick.
 Poi attendi conferma di Fabio prima di modificare `CLAUDE.md`. Questa analisi è la Fase 1 del comando REGISTRA (vedi sopra) e va sempre eseguita in quel contesto. Se Fabio annuncia la chiusura della sessione senza aver chiamato REGISTRA né PATCH, proponi comunque una PATCH autonomamente prima di concludere — **solo se** nella sessione sono emersi pattern non banali o gap ripetuti, non per un singolo bugfix minore.
 
 ---
@@ -335,3 +339,13 @@ Messaggio commit: `Sessione N — [funzionalità] / [cosa fatto] / [cosa resta]`
 - Python e Node.js sono installati in locale (14/07/2026) — disponibile un server di anteprima locale (`.claude/launch.json`, `localhost:8080`) per testare modifiche prima del push, invece di aspettare sempre il deploy Netlify
 - Claude Code non può ricevere né gestire credenziali (password, API key, service account, login CLI) di Firebase o altri servizi esterni — per configurazioni che richiedono accesso autenticato (es. regole Firestore), il flusso è: Fabio copia/incolla il dato non sensibile dalla console, o esegue lui stesso l'azione con permessi
 - I model ID nel dropdown Menu ⚙️ vanno riverificati contro il catalogo modelli Anthropic quando si tocca `index.html` per altri motivi, o comunque non oltre ogni 2-3 mesi — un modello deprecato non avvisa, fallisce silenziosamente solo alla chiamata (14/07/2026: trovati 2 modelli su 4 già oltre la data di ritiro Anthropic, corretti in sessione)
+
+---
+
+## Allineamento al template [UNIVERSALE]
+
+Template d'origine: APP
+Baseline: allineato a CLAUDE_APP_TEMPLATE.md il 19/08/2026
+Travasi recepiti: U-001
+
+> Le tre righe sopra dicono quali regole universali questo progetto ha già ricevuto, per identificatore, non per testo. Le aggiorna la sessione che applica un travaso. Registro completo in `Template Claude\docs\registro_travasi.md`.
