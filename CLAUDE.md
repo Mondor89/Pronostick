@@ -12,6 +12,8 @@
 1. Leggere questo file dall'inizio alla fine prima di fare qualsiasi altra cosa.
 2. Il progetto **non è nuovo** (`pronostick_stato.md` esiste, git ha commit) → comportamento normale: leggi i file `.md`, produci il RIEPILOGO se richiesto, attendi.
 
+> **Controllo di Gestione modello all'apertura della sessione.** Se il contesto già disponibile (un task dichiarato da Fabio, una nota che raccomanda un livello) indica una condizione di escalation prevista da *Gestione modello*, dichiararlo subito e proporla — non aspettare che Fabio lo debba ripetere.
+
 ---
 
 ## Identità del progetto
@@ -61,15 +63,22 @@ Se una patch approvata è marcata `AMBITO: da portare nel template`, chiedi conf
 
 **Fase 2 — REGISTRA vero e proprio.** Solo dopo la decisione della Fase 1 (ed eventuali modifiche a `CLAUDE.md` già applicate): leggi tutti i file `.md` e aggiornali con quanto emerso nella sessione, inclusa la decisione appena presa sulla PATCH. Indica cosa è cambiato in ogni file. Poi fai `git add . && git commit` in un unico commit che comprenda anche l'eventuale modifica a `CLAUDE.md` (chiedi conferma prima del push, salvo diversa indicazione di Fabio).
 
+> **Controllo di de-escalation in chiusura.** Se in questa sessione è stata usata un'escalation di modello o impegno, verificare se il lavoro che la giustificava è concluso: se sì, proporre esplicitamente la de-escalation in questo passo, prima del commit — non aspettare che Fabio la richieda.
+
+> **Proposta di audit indipendente in chiusura.** Se in questa sessione sono stati scritti o modificati codice, regole o config, proporre a Fabio — in questo stesso passo, prima del commit — un audit indipendente del lavoro fatto tramite un sotto-agente su un modello più potente di quello in uso (vedi "Sotto-agenti" in *Gestione modello*). È una proposta, non un'azione automatica.
+
 **Checklist obbligatoria REGISTRA (Fase 2) — rispondere sì/no a ogni voce, aggiornare se sì:**
 
 | File | Domanda trigger |
 |------|----------------|
 | `pronostick_stato.md` | Ci sono task completati, aperti o spostati, decisioni prese, alternative scartate questa sessione? |
+| `pronostick_stato.md` — tabella "Stato Attuale" | **Aggiornare SEMPRE, indipendentemente dalla riga sopra:** ultimo aggiornamento, ultima sessione e focus cambiano quasi ad ogni sessione anche quando nessuna regola cambia. |
 | `pronostick_sicurezza.md` | Sono cambiate invarianti di sicurezza, o è emersa una nuova funzionalità che tocca secret/dati utente? |
 | `CLAUDE.md` | Ci sono nuove regole, principi prodotto confermati, task aggiornati o idee scartate? |
 
 > ⚠️ Eseguire REGISTRA leggendo la checklist NON basta — ogni file va APERTO e confrontato con quanto emerso nella sessione.
+
+> **Controllo dei rimandi interni.** Se nella sessione una sezione è stata rinominata, spostata o eliminata, verificare che nessun'altra parte del file la citi ancora per nome (`grep` sul vecchio titolo). Il grep sul nome non basta: una frase può descriverne il comportamento senza mai nominarla e resta orfana lo stesso — dopo il grep, rileggere anche i paragrafi vicini a dove la sezione stava, cercando descrizioni equivalenti in altre parole. Vale per `CLAUDE.md` come per qualunque altro `.md` del progetto.
 
 **REVISIONA [nome funzionalità]** — Analizza la funzionalità indicata contro tutti i Principi Prodotto.
 Rispondi con: ✅ compatibile / ⚠ conflitto potenziale / ❌ violazione diretta — per ciascun principio.
@@ -142,9 +151,13 @@ Se **a sessione già avviata** Fabio chiede di rileggere questo file (non il pri
 
 **Quando restare sul modello base:** fix singolo e localizzato, test + correzioni, tweak UI/testo, refactor piccolo.
 
-**Quando scendere (de-escalation):** dopo un'escalation il costo è concentrato nella fase di analisi; cambiare modello non fa perdere il contesto già emerso in chat, quindi appena il lavoro pesante è concluso e resta solo da applicare passi già definiti, proporre la discesa. Restare in alto — dicendolo — se un fix fallisce due volte sullo stesso sintomo senza progressi. Mai risalire in silenzio.
+**Quando scendere (de-escalation):** dopo un'escalation il costo è concentrato nella fase di analisi; cambiare modello non fa perdere il contesto già emerso in chat, quindi appena il lavoro pesante è concluso e resta solo da applicare passi già definiti, proporre la discesa. Restare in alto — dicendolo — se un fix fallisce due volte sullo stesso sintomo senza progressi. Mai risalire in silenzio. La proposta di de-escalation va scritta nello stesso messaggio che consegna il risultato della fase pesante, non rimandata a un messaggio successivo — è il punto di transizione più a rischio di restare silente, perché non ha un comando fisso ad agganciarsi come l'apertura sessione o REGISTRA.
 
 **Come proporlo:** motivazione con (1) perché serve più potenza, (2) quale livello e perché, (3) rischio restando sul base. Poi `/model` manuale. Non bloccare il lavoro in attesa — proporre e continuare, salvo blocco reale.
+
+**Dopo un'escalation confermata (`/model` eseguito), prima di scrivere nuovo codice sul task che l'ha motivata:** riguardare quanto già prodotto in questa sessione per quel task con il modello precedente, cercare gap che il modello nuovo può vedere e il vecchio no (casi limite non gestiti, assunzioni implicite), e dichiararli prima di proseguire — o dichiarare esplicitamente "nessun gap trovato". Solo in salita, mai in de-escalation.
+
+**Sotto-agenti — la terza leva.** Oltre a modello e impegno, Claude può delegare da solo un pezzo di lavoro isolabile (ricerca approfondita, verifica incrociata, analisi ampia) a un sotto-agente su un modello più potente, senza toccare il modello della conversazione principale. Regole d'uso: dichiarare sempre il modello scelto; restare entro i modelli inclusi nel piano Pro di Fabio, mai un modello a consumo extra senza notificarlo esplicitamente e attendere approvazione prima del lancio; il risultato del sotto-agente sostituisce quello debole, non lo affianca, e va presentato prima che Fabio confermi la decisione a valle.
 
 **Autocalibrazione:** se Fabio segnala una proposta eccessiva o mancata, salvare la correzione in memoria (tipo `feedback`).
 
@@ -330,6 +343,9 @@ Messaggio commit: `Sessione N — [funzionalità] / [cosa fatto] / [cosa resta]`
 ### localStorage — chiave stabile [PERMANENTE]
 - `pronostick_apikey`, `pronostick_v3_history`, `pronostick_model` sono le chiavi correnti — non cambiarle senza gestire esplicitamente la migrazione dei dati esistenti (vedi `loadHistory()` per il pattern di migrazione già usato).
 
+### Variabili `.env` (Netlify Functions) — non si ricaricano da sole [PERMANENTE]
+- Se in locale si usa `dotenv` per testare `netlify/functions/proxy.js` fuori da `netlify dev`, le variabili si leggono una sola volta all'avvio del processo — un valore cambiato nel `.env` non si aggiorna da solo, nemmeno con un refresh della pagina. A differenza di un processo watch/dev, qui non c'è alcun segnale visibile: serve chiudere e riavviare il processo da zero per testare un valore diverso.
+
 ---
 
 ## Note permanenti
@@ -348,6 +364,6 @@ Messaggio commit: `Sessione N — [funzionalità] / [cosa fatto] / [cosa resta]`
 
 Template d'origine: APP
 Baseline: allineato a CLAUDE_APP_TEMPLATE.md il 19/08/2026
-Travasi recepiti: U-001
+Travasi recepiti: U-001, U-003, U-016, U-017, U-018, U-019, U-020, U-021
 
 > Le tre righe sopra dicono quali regole universali questo progetto ha già ricevuto, per identificatore, non per testo. Le aggiorna la sessione che applica un travaso. Registro completo in `Template Claude\docs\registro_travasi.md`.
