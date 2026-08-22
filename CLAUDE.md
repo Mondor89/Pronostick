@@ -367,3 +367,5 @@ Baseline: allineato a CLAUDE_APP_TEMPLATE.md il 19/08/2026
 Travasi recepiti: U-001, U-003, U-016, U-017, U-018, U-019, U-020, U-021
 
 > Le tre righe sopra dicono quali regole universali questo progetto ha già ricevuto, per identificatore, non per testo. Le aggiorna la sessione che applica un travaso. Registro completo in `Template Claude\docs\registro_travasi.md`.
+
+> **Se un travaso da recepire presuppone una sezione o un contenuto che questo progetto non ha mai ricevuto** (baseline non integrale — qui la baseline del 19/08/2026 applicò solo 3 regole retroattive mirate, non un confronto integrale col template), segnalarlo esplicitamente a Fabio prima di scrivere una versione minimale di quel contenuto: non è un travaso puro, è anche colmare un debito di baseline, ed è una scelta che merita conferma.
