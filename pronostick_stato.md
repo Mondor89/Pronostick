@@ -8,8 +8,8 @@
 
 | Campo | Valore |
 |-------|--------|
-| **Ultimo aggiornamento** | 22/08/2026 |
-| **Ultima sessione** | Recepiti 7 travasi pendenti dal registro template (U-003, U-016–U-021) in `CLAUDE.md`: controlli Gestione modello, sezione sotto-agenti, controllo rimandi interni, riga Stato Attuale sempre aggiornata, pattern `.env`. Nessun bug, nessuna nuova funzionalità |
+| **Ultimo aggiornamento** | 25/08/2026 |
+| **Ultima sessione** | RECEPISCI di 12 travasi pendenti (U-022–U-033) in `CLAUDE.md`, con audit indipendente (sotto-agente Opus 5) prima di scrivere; 2 casi di debito di baseline colmati su scelta esplicita di Fabio (U-023, U-027), 3 valutati non applicabili allo stack (verificato su Pronostick e Pronostick.Code). PATCH applicata: verifica di applicabilità deve coprire entrambe le basi di codice, non solo il Pronostick reale |
 | **Deploy** | https://pronostick.netlify.app/ |
 | **GitHub** | Mondor89/Pronostick |
 | **Tier Anthropic** | Tier 1 (modello consigliato: Haiku) |
@@ -19,7 +19,7 @@
 ## Focus Attuale
 App funzionante e deployata, nessun bug noto aperto. Roadmap Memoria AI (vedi Task Aperte) ancora ferma al primo gradino per mancanza di dati (pochi pronostici verificati). Dettaglio delle sessioni 15-16/07/2026 (ricerca calendario, fix escaping Verifica Risultato) in Log Sessioni/Archivio Log sotto.
 
-**Pronostick.Code** (`Pronostick.Code/`, avviato 26/07/2026): motore satellite di analisi/verifica pronostici via Claude Code (WebSearch nativo) invece che API a pagamento, isolato dal Pronostick reale, usato da Fabio con soldi reali (KPI/ROI in `dashboard.html`). Sessioni 1-3 completate, primo pronostico reale verificato VINTO (28/07/2026) — dettaglio in Archivio Log/Decisioni Prese. Resta solo il test a mano del selettore di cartella nativo (vedi Task Aperte). **Novità 22/08/2026:** recepiti i 7 travasi pendenti dal registro template (U-003, U-016–U-021) — vedi `CLAUDE.md`.
+**Pronostick.Code** (`Pronostick.Code/`, avviato 26/07/2026): motore satellite di analisi/verifica pronostici via Claude Code (WebSearch nativo) invece che API a pagamento, isolato dal Pronostick reale, usato da Fabio con soldi reali (KPI/ROI in `dashboard.html`). Sessioni 1-3 completate, primo pronostico reale verificato VINTO (28/07/2026) — dettaglio in Archivio Log/Decisioni Prese. Resta solo il test a mano del selettore di cartella nativo (vedi Task Aperte). **Novità 25/08/2026:** ora esplicitamente coperto dalla verifica di applicabilità dei travasi/pattern-trappola, non solo il Pronostick reale — vedi `CLAUDE.md`.
 
 ---
 
@@ -68,12 +68,15 @@ App funzionante e deployata, nessun bug noto aperto. Roadmap Memoria AI (vedi Ta
 - [x] Pronostick.Code — Sessioni 1-3 (fondamenta, dashboard, guida/FAQ poi unificata) + skill `analizza-locale` + prima analisi reale Musetti vs Arnaldi + tracciamento soldi reali — dettaglio in Archivio Log (26/07/2026)
 - [x] Passo 3 — collegamento al meccanismo di manutenzione dei template: campo `AMBITO` nel comando PATCH, deposito patch verso `Template Claude\patch\_inbox\` in REGISTRA Fase 1, blocco `## Allineamento al template` (baseline 19/08/2026, `Travasi recepiti: U-001`) in `CLAUDE.md` (20/08/2026)
 - [x] Recepiti i 7 travasi pendenti dal registro (U-003, U-016–U-021): controlli Gestione modello, sezione sotto-agenti, controllo rimandi interni, riga Stato Attuale sempre aggiornata, pattern `.env`/dotenv — `Travasi recepiti` aggiornato in `CLAUDE.md` (22/08/2026)
+- [x] RECEPISCI dei 12 travasi successivi (U-022–U-033): audit pre-scrittura via sotto-agente (Opus 5) su richiesta di Fabio, 2 casi di debito di baseline colmati (U-023 frase "Ambito della regola", U-027 nuova sezione su evolvere in versione online), 3 valutati non applicabili (U-025/U-029/U-030 — nessun server locale con validazione Origin, nessuna richiesta di rete verso URL utente, nessun comando di sistema esterno, verificato su entrambe le basi di codice), 1 bug reale trovato e documentato (`setTimeout` in `index.html:2780`, vedi Bug Noti). PATCH applicata: la verifica di applicabilità di un travaso deve coprire anche `Pronostick.Code/dashboard.html`, non solo il Pronostick reale (25/08/2026)
 
 ---
 
 ## Bug Noti
 
-Nessun bug noto aperto al momento (chiusi tutti in sessione del 14/07/2026 — vedi Log Sessioni). I bug risolti sono compressi in Archivio Log.
+- [ ] `setTimeout(initGiocataSports, 50)` in `index.html:2780` — attesa fissa invece del segnale reale di readiness (`DOMContentLoaded` o ordine di caricamento script). Funziona quasi sempre, non ha mai dato problemi osservati — trovato per applicazione di U-033 (25/08/2026), non ancora corretto, priorità bassa.
+
+I bug precedenti sono compressi in Archivio Log (chiusi tutti in sessione del 14/07/2026).
 
 ---
 
@@ -89,6 +92,7 @@ Nessun bug noto aperto al momento (chiusi tutti in sessione del 14/07/2026 — v
 | 26/07/2026 | 2 patch a `CLAUDE.md`: Gestione modello (chiedere sempre il modello/impegno attuale prima di proporre un'escalation) e Definizione "funzionalità completata" (dialoghi nativi del SO vanno sempre testati a mano) | Due gap reali trovati nella sessione: escalation proposta quando Fabio aveva già quel livello; automazione browser non può interagire col selettore di cartella nativo |
 | 20/08/2026 | Eseguito il Passo 3 (`Template Claude\docs\passo3_collegamento_progetti.md`): aggiunto campo `AMBITO` al comando PATCH, passo di deposito patch universali in `patch/_inbox/` durante REGISTRA Fase 1, blocco di allineamento con baseline 19/08/2026 (`Travasi recepiti: U-001`) | Pronostick era antecedente al meccanismo di manutenzione dei template — senza questo collegamento una lezione universale trovata qui restava intrappolata nel `CLAUDE.md` locale invece di raggiungere gli altri progetti |
 | 22/08/2026 | Recepiti i 7 travasi pendenti (U-003, U-016–U-021) invece di aspettare una sessione dedicata futura; nessuno introduceva conflitti con le regole esistenti | Fabio ha chiesto esplicitamente "recepisci"; il confronto per ID (non per testo) contro il registro non lasciava ambiguità sul cosa applicare |
+| 25/08/2026 | Recepiti i 12 travasi successivi (U-022–U-033), inclusi 2 casi di debito di baseline (U-023, U-027) applicati per scelta esplicita di Fabio invece di essere saltati | L'audit pre-scrittura (sotto-agente Opus 5, richiesto da Fabio dato il batch di patch su sezioni condivise) ha trovato correzioni sostanziali su quasi tutti i punti — confermato che vale la pena farlo prima di scrivere, non solo a lavoro fatto |
 
 ---
 
@@ -108,12 +112,13 @@ Nessun bug noto aperto al momento (chiusi tutti in sessione del 14/07/2026 — v
 
 | Data | Attività |
 |------|----------|
-| 22/08/2026 | RIEPILOGO, poi recepiti i 7 travasi pendenti dal registro template (U-003, U-016–U-021) in `CLAUDE.md`: controlli Gestione modello (apertura sessione, timing de-escalation, audit post-escalation), sezione sotto-agenti, controllo rimandi interni, riga Stato Attuale sempre aggiornata, pattern `.env`/dotenv. Commit `1a34646`, push. REGISTRA: Fase 1 trovata 1 PATCH non banale (gap del meccanismo travasi su baseline non integrale — due travasi presupponevano una sezione mai ricevuta), applicata a `CLAUDE.md` e depositata in `patch/_inbox/` (`AMBITO: da portare nel template`); compressa in Archivio Log la voce del 20/08/2026. |
+| 25/08/2026 | RIEPILOGO, poi RECEPISCI dei 12 travasi pendenti (U-022–U-033) in `CLAUDE.md`: audit pre-scrittura via sotto-agente Opus 5 (batch su sezioni condivise), 2 debiti di baseline colmati su scelta di Fabio (U-023, U-027), 3 non applicabili verificati su Pronostick + Pronostick.Code (U-025/029/030), 1 istanza di bug reale citata (`setTimeout` in `index.html:2780`). REGISTRA: Fase 1 trovata 1 PATCH (la verifica di applicabilità di un travaso deve coprire entrambe le basi di codice, non solo `index.html`/`proxy.js` — emerso da una domanda diretta di Fabio), applicata a `CLAUDE.md`; compressa in Archivio Log la voce del 22/08/2026. |
 
 ## Archivio Log
 > Sessioni e decisioni più vecchie, spostate qui il 14-26/07/2026 per restare sotto le 150 righe — dettaglio ridotto, il codice/git history restano la fonte primaria per i dettagli tecnici.
 
 ### Sessioni precedenti
+- **22/08/2026** — Recepiti i 7 travasi pendenti dal registro template (U-003, U-016–U-021) in `CLAUDE.md`: controlli Gestione modello (apertura sessione, timing de-escalation, audit post-escalation), sezione sotto-agenti, controllo rimandi interni, riga Stato Attuale sempre aggiornata, pattern `.env`/dotenv. Commit `1a34646`, push. REGISTRA: Fase 1 trovata 1 PATCH non banale (gap del meccanismo travasi su baseline non integrale — due travasi presupponevano una sezione mai ricevuta), applicata a `CLAUDE.md` e depositata in `patch/_inbox/` (`AMBITO: da portare nel template`).
 - **20/08/2026** — Passo 3: collegamento al meccanismo di manutenzione dei template (campo `AMBITO` nel comando PATCH, deposito patch in REGISTRA Fase 1, blocco Allineamento al template, baseline 19/08/2026, `Travasi recepiti: U-001`), commit `3a74337`.
 - **28/07/2026** — Verificato il primo pronostico reale di Pronostick.Code (Musetti vs Arnaldi, VINTO). Lezione: la quota di mercato (1.36) più accurata della stima interna (60% vs ~73% implicito).
 - **26/07/2026** — Avviato **Pronostick.Code** (satellite separato e reversibile invece di un'estensione ibrida di `index.html`, scartata per rischio architetturale): Sessione 1 fondamenta (`Pronostick.Code/`, skill `analizza-locale`), prima analisi reale (Musetti vs Arnaldi), Sessione 2 dashboard, Sessione 3 guida/FAQ (poi unificata con la dashboard), tracciamento soldi reali (`importo_giocato`/`quota_reale`/KPI/ROI). Patch a `CLAUDE.md` (Gestione modello — chiedere sempre il modello/impegno attuale prima di proporre un cambio).

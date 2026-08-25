@@ -79,6 +79,8 @@ Se una patch approvata è marcata `AMBITO: da portare nel template`, chiedi conf
 > ⚠️ Eseguire REGISTRA leggendo la checklist NON basta — ogni file va APERTO e confrontato con quanto emerso nella sessione.
 
 > **Controllo dei rimandi interni.** Se nella sessione una sezione è stata rinominata, spostata o eliminata, verificare che nessun'altra parte del file la citi ancora per nome (`grep` sul vecchio titolo). Il grep sul nome non basta: una frase può descriverne il comportamento senza mai nominarla e resta orfana lo stesso — dopo il grep, rileggere anche i paragrafi vicini a dove la sezione stava, cercando descrizioni equivalenti in altre parole. Vale per `CLAUDE.md` come per qualunque altro `.md` del progetto.
+>
+> *Il caso opposto — verificare un rimando **nuovo** prima di scriverlo, invece di ripararne uno diventato orfano — sta in "Principi di debug e architettura".*
 
 **REVISIONA [nome funzionalità]** — Analizza la funzionalità indicata contro tutti i Principi Prodotto.
 Rispondi con: ✅ compatibile / ⚠ conflitto potenziale / ❌ violazione diretta — per ciascun principio.
@@ -103,6 +105,10 @@ PRIORITÀ: [alta / media / bassa]
 ```
 `AMBITO` non è una formalità: marcare `da portare nel template` quando la lezione non dipende dallo stack/dominio di Pronostick.
 Poi attendi conferma di Fabio prima di modificare `CLAUDE.md`. Questa analisi è la Fase 1 del comando REGISTRA (vedi sopra) e va sempre eseguita in quel contesto. Se Fabio annuncia la chiusura della sessione senza aver chiamato REGISTRA né PATCH, proponi comunque una PATCH autonomamente prima di concludere — **solo se** nella sessione sono emersi pattern non banali o gap ripetuti, non per un singolo bugfix minore.
+
+**Prima di scrivere una patch approvata**, se tocca una sezione condivisa o di sicurezza (Gestione modello, Meta-regole, invarianti di sicurezza) o se in questo turno sono state confermate più patch insieme, proporre esplicitamente a Fabio se conviene un audit indipendente del testo proposto tramite sotto-agente su un modello più potente (terza leva, vedi *Gestione modello*) — PRIMA di scriverlo, non a lavoro già applicato. Diverso dall'audit di chiusura in REGISTRA: quello rivede il lavoro già fatto, questo rivede una modifica non ancora scritta nel file. Proposta, non automatismo: la decisione se lanciarlo resta di Fabio.
+
+**Controllo anti-accumulo (obbligatorio ad ogni patch).** Quando proponi una regola nuova, verifica se ne rende una esistente ridondante o superata, e dillo nello stesso blocco. Aggiungere regole senza mai toglierne è il modo in cui un file di regole diventa illeggibile — e togliere una regola morta vale quanto aggiungerne una viva.
 
 ---
 
@@ -157,9 +163,13 @@ Se **a sessione già avviata** Fabio chiede di rileggere questo file (non il pri
 
 **Dopo un'escalation confermata (`/model` eseguito), prima di scrivere nuovo codice sul task che l'ha motivata:** riguardare quanto già prodotto in questa sessione per quel task con il modello precedente, cercare gap che il modello nuovo può vedere e il vecchio no (casi limite non gestiti, assunzioni implicite), e dichiararli prima di proseguire — o dichiarare esplicitamente "nessun gap trovato". Solo in salita, mai in de-escalation.
 
-**Sotto-agenti — la terza leva.** Oltre a modello e impegno, Claude può delegare da solo un pezzo di lavoro isolabile (ricerca approfondita, verifica incrociata, analisi ampia) a un sotto-agente su un modello più potente, senza toccare il modello della conversazione principale. Regole d'uso: dichiarare sempre il modello scelto; restare entro i modelli inclusi nel piano Pro di Fabio, mai un modello a consumo extra senza notificarlo esplicitamente e attendere approvazione prima del lancio; il risultato del sotto-agente sostituisce quello debole, non lo affianca, e va presentato prima che Fabio confermi la decisione a valle.
+**Ambito della regola — solo il modello di conversazione.** Quando Claude lancia un sotto-agente (Agent tool), può già scegliere il modello del sotto-agente da solo, senza chiedere — salvo il vincolo sul piano di Fabio descritto qui sotto in *Sotto-agenti — la terza leva* (mai un modello a consumo extra senza notifica esplicita e approvazione prima del lancio).
+
+**Sotto-agenti — la terza leva.** Oltre a modello e impegno, Claude può delegare da solo un pezzo di lavoro isolabile (ricerca approfondita, verifica incrociata, analisi ampia) a un sotto-agente su un modello più potente, senza toccare il modello della conversazione principale. Regole d'uso: dichiarare sempre il modello scelto; restare entro i modelli inclusi nel piano Pro di Fabio, mai un modello a consumo extra senza notificarlo esplicitamente e attendere approvazione prima del lancio; il risultato del sotto-agente sostituisce quello debole, non lo affianca, e va presentato prima che Fabio confermi la decisione a valle. Un caso frequente di lavoro isolabile: la revisione di una modifica proposta a una sezione condivisa/di sicurezza di questo file prima che Fabio la confermi (vedi PATCH).
 
 **Autocalibrazione:** se Fabio segnala una proposta eccessiva o mancata, salvare la correzione in memoria (tipo `feedback`).
+
+**Rinforzo meccanico — hook `PostToolUse`** *(se configurato in `~/.claude/settings.json` — verificato attivo il 25/08/2026)*. Quando l'hook è attivo, dopo ogni `Edit`/`Write`/`MultiEdit` compare un promemoria di Gestione modello. Non va scartato in silenzio — valutarlo esplicitamente contro i criteri sopra e dichiarare la conclusione, anche quando è "resto sul modello base". Giudizi identici e consecutivi si possono dichiarare in forma compatta per il gruppo di operazioni, non uno per tool call.
 
 ---
 
@@ -184,6 +194,8 @@ Se **a sessione già avviata** Fabio chiede di rileggere questo file (non il pri
 - **Un bug che sembra "strano" o "impossibile" nasce spesso da precedenza degli operatori, non da logica sbagliata.** Vedi "Regole JavaScript/Web" più sotto — Pronostick aveva 4 bug reali di questo tipo (corretti il 14/07/2026).
 - **Se un passaggio di verifica non è eseguibile dallo strumento di automazione, non forzarlo e non aggirarlo: dichiara il limite e chiedi a Fabio di eseguire lui l'ultimo passaggio.** Quattro cause, stessa soluzione: (a) un secret reale in un campo UI — la policy ne blocca l'inserimento, ed è corretto; (b) un dialogo nativo dell'OS (file picker, File System Access API) — limite dello strumento; (c) un comando shell che fallisce per permessi/sessione/credenziali mentre il codice sembra corretto — farlo rieseguire a Fabio dal suo terminale **prima** di concludere che è rotto; (d) un'anteprima che sembra funzionare e invece no — pagina resa come snapshot statico, CSS/iframe/JS non caricati, **nessun errore in console o network**: è il caso peggiore, perché il tool non segnala niente. In tutti i casi: verificare la logica raggiungibile con uno script o `curl`, dichiarare il limite, e non dichiarare mai "testato" ciò che non lo è.
 - **Quando si ripristina un handler o percorso di codice prima irraggiungibile (bottone rotto, funzione inesistente, condizione sempre falsa), testare l'azione fino in fondo con un click reale — non fermarsi a verificare che la funzione richiamata esista.** Codice a valle mai eseguito in produzione può nascondere bug dormienti scoperti solo ora (es. 14/07/2026: riabilitato il bottone Elimina nello Storico, la funzione esisteva ma un `insertBefore` al suo interno falliva su un nodo non figlio diretto — mai emerso prima perché il bottone non era mai stato cliccabile).
+- **Prima di scrivere un rimando a un'altra sezione dello stesso documento — o a un altro file — verificare con un `grep`/lettura mirata che la destinazione esista e contenga davvero ciò a cui si sta rimandando**, non fidarsi della ricostruzione a memoria. Se la verifica fallisce, correggere il rimando o aggiungere il contenuto mancante — un rimando quasi giusto manda fuori strada come uno rotto. Gemello preventivo del "Controllo dei rimandi interni" in REGISTRA: quello ripara i rimandi orfani dopo che una sezione sparisce, questo evita di crearne di rotti prima.
+- **Un'attesa fissa (`timeout`/`sleep`) prima di un'azione che dipende dalla disponibilità di qualcos'altro è sempre una scommessa**: troppo corta e fallisce in modo subdolo (sembra funzionare quasi sempre), troppo lunga e spreca tempo. Preferire il segnale reale di readiness (un callback/evento che il componente espone); se non esiste, un poll che verifica la condizione vera invece di un tempo indovinato. In entrambi i casi l'attesa va limitata: un tetto di tempo/tentativi + errore esplicito allo scadere — un'attesa senza limite non fallisce, si pianta, ed è peggio di un timeout troppo corto. *Caso presente in Pronostick: `setTimeout(initGiocataSports, 50)` (`index.html`, commentato "after DOM is ready") — funziona quasi sempre, ed è il modo in cui questo bug si nasconde; il segnale vero sarebbe `DOMContentLoaded` o l'ordine di caricamento dello script.*
 
 ---
 
@@ -282,8 +294,21 @@ Se `index.html` dovesse superare le ~6000 righe o servissero più pagine distint
 - Nessun confronto automatico tra i due motori integrato nella skill — un eventuale confronto side-by-side resta una scelta manuale e occasionale di Fabio
 - `dashboard.html` include anche la guida (unificate in un'unica pagina con toggle Dashboard/Guida il 26/07/2026, eliminato il file `istruzioni.html` separato) e usa la File System Access API in lettura/scrittura solo sulla cartella `pronostici/` locale — resta comunque isolata da `index.html`/localStorage/Firestore, stesso principio del primo punto
 - Skill che lo governa: `.claude/skills/analizza-locale/SKILL.md`. Roadmap a fasi (motore → dashboard → guida): vedi `Pronostick.Code/LEGGIMI.md` e Task Aperte in `pronostick_stato.md`
+- **Quando si verifica l'applicabilità di una regola/pattern-trappola al codice** (RECEPISCI, PATCH, code review), controllare tutte le basi di codice governate da questo `CLAUDE.md` — non solo `index.html`/`proxy.js`: anche `Pronostick.Code/dashboard.html`, che condivide lo stesso ciclo REGISTRA (vedi Governance sotto) pur essendo isolato a runtime. Trovato il 25/08/2026: una verifica di applicabilità di 5 travasi si era fermata al solo Pronostick reale, e Fabio ha dovuto chiederlo esplicitamente per estenderla.
 
 **Governance:** Pronostick.Code non ha un proprio ciclo RIEPILOGO/REGISTRA separato — resta sotto lo stesso `CLAUDE.md`/REGISTRA di Pronostick, essendo una sotto-cartella dello stesso repository. Se in futuro crescesse fino a giustificarlo, valutare una governance dedicata come per il progetto gemello Bracco.
+
+---
+
+## Evolvere questo progetto (o un suo satellite) in una versione online o distribuibile [UNIVERSALE]
+
+Se in futuro Pronostick o un suo satellite (es. Pronostick.Code) dovesse diventare disponibile ad altri utenti o online, valutare un **progetto separato**: il sorgente resta semplice per l'uso personale, la versione distribuita porta con sé complessità che l'originale non deve avere (hosting, multi-utente, superficie di sicurezza più ampia). Se diventa davvero multi-utente, prima del rilascio serve un passaggio esplicito di security review — vedi "Fase attuale" e `pronostick_sicurezza.md`, dove la verifica delle regole Firestore è già in sospeso.
+
+**Passaggio obbligato:** aprire la sessione di setup direttamente nella cartella del progetto nuovo, mai in quella del sorgente — `~/.claude/projects/` è indicizzato per percorso assoluto, e impostare il progetto da una sessione ancorata altrove ne orfana la cronologia fin dalla nascita. In pratica: creare la cartella vuota, poi lanciare Claude Code da lì.
+
+**Il codice si copia come punto di partenza, non si sincronizza:** da quel momento le due basi evolvono indipendentemente, salvo decisione esplicita diversa — stesso principio già in vigore per il travaso di miglioramenti da Pronostick.Code verso il Pronostick reale (sempre manuale, mai automatico).
+
+> Sistema archetipi A/B/C del template volutamente non introdotto — vedi nota sotto "Allineamento al template".
 
 ---
 
@@ -343,6 +368,11 @@ Messaggio commit: `Sessione N — [funzionalità] / [cosa fatto] / [cosa resta]`
 ### localStorage — chiave stabile [PERMANENTE]
 - `pronostick_apikey`, `pronostick_v3_history`, `pronostick_model` sono le chiavi correnti — non cambiarle senza gestire esplicitamente la migrazione dei dati esistenti (vedi `loadHistory()` per il pattern di migrazione già usato).
 
+### Cleanup asincrono prima di un reject/throw [PERMANENTE]
+- Un cleanup asincrono "best-effort" (`qualcosa().catch(() => {})`) scritto subito prima di un `reject(...)`/`throw` sincrono non garantisce che il cleanup finisca prima che chi chiama osservi l'errore — sono una corsa, non una sequenza.
+- Incatenare la propagazione in `.finally()` o attendere con `await` prima di propagare, mai lasciare il cleanup "in volo" e propagare subito dopo.
+- **Cercare ogni `xxx(...).catch(() => {})` seguito da `reject`/`throw` nella riga dopo**: è lo stesso errore ovunque compaia. Oggi zero istanze sia in `index.html` sia in `Pronostick.Code/dashboard.html` (verificato con grep su entrambi) — se ne comparisse una, è un candidato naturale per un nuovo controllo in `scripts/check-known-bug-patterns.sh`.
+
 ### Variabili `.env` (Netlify Functions) — non si ricaricano da sole [PERMANENTE]
 - Se in locale si usa `dotenv` per testare `netlify/functions/proxy.js` fuori da `netlify dev`, le variabili si leggono una sola volta all'avvio del processo — un valore cambiato nel `.env` non si aggiorna da solo, nemmeno con un refresh della pagina. A differenza di un processo watch/dev, qui non c'è alcun segnale visibile: serve chiudere e riavviare il processo da zero per testare un valore diverso.
 
@@ -364,8 +394,10 @@ Messaggio commit: `Sessione N — [funzionalità] / [cosa fatto] / [cosa resta]`
 
 Template d'origine: APP
 Baseline: allineato a CLAUDE_APP_TEMPLATE.md il 19/08/2026
-Travasi recepiti: U-001, U-003, U-016, U-017, U-018, U-019, U-020, U-021
+Travasi recepiti: U-001, U-003, U-016, U-017, U-018, U-019, U-020, U-021, U-022, U-023, U-024, U-025, U-026, U-027, U-028, U-029, U-030, U-031, U-032, U-033
 
 > Le tre righe sopra dicono quali regole universali questo progetto ha già ricevuto, per identificatore, non per testo. Le aggiorna la sessione che applica un travaso. Registro completo in `Template Claude\docs\registro_travasi.md`.
 
 > **Se un travaso da recepire presuppone una sezione o un contenuto che questo progetto non ha mai ricevuto** (baseline non integrale — qui la baseline del 19/08/2026 applicò solo 3 regole retroattive mirate, non un confronto integrale col template), segnalarlo esplicitamente a Fabio prima di scrivere una versione minimale di quel contenuto: non è un travaso puro, è anche colmare un debito di baseline, ed è una scelta che merita conferma.
+
+> **Note sui travasi applicati parzialmente (RECEPISCI del 25/08/2026):** `U-024` era già presente (nato da una sessione Pronostick del 22/08/2026, generalizzato poi nel template). `U-025` (allowlist Origin su server locale), `U-029` (SSRF via URL utente) e `U-030` (command injection) valutati e giudicati **non applicabili** allo stack attuale — verificato su **entrambe le basi di codice del repository**: `netlify/functions/proxy.js` + `.claude/launch.json` (Pronostick reale) e `Pronostick.Code/dashboard.html` (satellite locale). Nessun server locale con validazione Origin, nessuna richiesta di rete server-side verso un URL fornito dall'utente (il proxy chiama sempre lo stesso endpoint Anthropic fisso; `dashboard.html` non fa alcuna chiamata di rete, solo File System Access API locale), nessun comando di sistema esterno eseguito nel codice. Se in futuro una delle due acquisisse una di queste superfici (es. un server locale custom, download da URL utente, esecuzione di tool esterni), questi tre ID vanno rivalutati da zero, non dati per coperti. Stessa doppia verifica per U-026 (cleanup asincrono, zero istanze in entrambi i file) e U-033 (attesa fissa: un solo `setTimeout` in `dashboard.html`, riga 766, ma è un toast "salvato" — non un'attesa di readiness, stessa categoria degli usi legittimi già esclusi in `index.html`). `U-023` e `U-027` presupponevano contenuti mai ricevuti in baseline (rispettivamente la frase "Ambito della regola" e il sistema archetipi A/B/C) — per U-023 Fabio ha scelto di scrivere la frase intera; per U-027 di applicare solo la parte pertinente, senza introdurre gli archetipi A/B/C.
